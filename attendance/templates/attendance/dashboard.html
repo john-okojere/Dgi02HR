@@ -1,0 +1,390 @@
+<!-- attendance/templates/attendance/dashboard.html -->
+{% extends 'attendance/base.html' %}
+
+{% block title %}Dashboard | HR Management{% endblock %}
+
+{% block page_title %}Dashboard Overview{% endblock %}
+
+{% block content %}
+<div class="container-fluid p-0">
+    
+    <!-- Overall Stats Cards -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-2">
+            <div class="card stat-card border-0 h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <small class="text-uppercase text-muted fw-semibold">Total People</small>
+                            <div class="stat-value mt-2">{{ total_employees }}</div>
+                        </div>
+                        <div class="bg-primary bg-opacity-10 p-3 rounded">
+                            <i class="bi bi-people-fill fs-4 text-primary"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-2">
+            <div class="card stat-card border-0 h-100" style="border-left-color: #10b981;">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <small class="text-uppercase text-muted fw-semibold">Present</small>
+                            <div class="stat-value mt-2 text-success">{{ checked_in_count }}</div>
+                        </div>
+                        <div class="bg-success bg-opacity-10 p-3 rounded">
+                            <i class="bi bi-box-arrow-in-right fs-4 text-success"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-2">
+            <div class="card stat-card border-0 h-100" style="border-left-color: #f59e0b;">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <small class="text-uppercase text-muted fw-semibold">Late Today</small>
+                            <div class="stat-value mt-2 text-warning">{{ late_count }}</div>
+                        </div>
+                        <div class="bg-warning bg-opacity-10 p-3 rounded">
+                            <i class="bi bi-clock-history fs-4 text-warning"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-2">
+            <div class="card stat-card border-0 h-100" style="border-left-color: #3b82f6;">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <small class="text-uppercase text-muted fw-semibold">Completed</small>
+                            <div class="stat-value mt-2 text-info">{{ checked_out_count }}</div>
+                        </div>
+                        <div class="bg-info bg-opacity-10 p-3 rounded">
+                            <i class="bi bi-check-circle fs-4 text-info"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-2">
+            <div class="card stat-card border-0 h-100" style="border-left-color: #ef4444;">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <small class="text-uppercase text-muted fw-semibold">Absent</small>
+                            <div class="stat-value mt-2 text-danger">{{ absent_count }}</div>
+                        </div>
+                        <div class="bg-danger bg-opacity-10 p-3 rounded">
+                            <i class="bi bi-person-x fs-4 text-danger"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-2">
+            <div class="card stat-card border-0 h-100" style="border-left-color: #8b5cf6;">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <small class="text-uppercase text-muted fw-semibold">Attendance</small>
+                            <div class="stat-value mt-2">
+                                {% if total_employees > 0 %}
+                                    {% widthratio checked_in_count|add:checked_out_count total_employees 100 %}%
+                                {% else %}
+                                    0%
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="bg-purple bg-opacity-10 p-3 rounded">
+                            <i class="bi bi-pie-chart fs-4" style="color: #8b5cf6;"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Category Breakdown Cards -->
+    <div class="row g-4 mb-4">
+        {% for stat in category_stats %}
+        <div class="col-lg-4 col-md-6">
+            <div class="card border-0 h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div class="d-flex align-items-center">
+                            <div class="bg-{{ stat.category.color }} bg-opacity-10 p-3 rounded me-3">
+                                <i class="bi {{ stat.category.icon }} fs-4 text-{{ stat.category.color }}"></i>
+                            </div>
+                            <div>
+                                <h6 class="mb-0">{{ stat.category.name }}</h6>
+                                <small class="text-muted">Total: {{ stat.total }}</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row text-center border-top pt-3">
+                        <div class="col-4">
+                            <h5 class="text-success mb-0">{{ stat.present }}</h5>
+                            <small class="text-muted text-uppercase">Present</small>
+                        </div>
+                        <div class="col-4">
+                            <h5 class="text-warning mb-0">{{ stat.late }}</h5>
+                            <small class="text-muted text-uppercase">Late</small>
+                        </div>
+                        <div class="col-4">
+                            <h5 class="text-danger mb-0">{{ stat.absent }}</h5>
+                            <small class="text-muted text-uppercase">Absent</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <div class="alert alert-info">
+                <i class="bi bi-info-circle me-2"></i>No categories defined. Please run <code>python manage.py init_data</code>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    
+    <div class="row g-4">
+        <!-- Recent Activity -->
+        <div class="col-lg-8">
+            <div class="card border-0">
+                <div class="card-header bg-white border-0 pt-4 px-4">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">
+                            <i class="bi bi-clock-history me-2"></i>Recent Activity
+                        </h5>
+                        <a href="{% url 'attendance_reports' %}" class="text-decoration-none">
+                            View All <i class="bi bi-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead>
+                                <tr>
+                                    <th>Person</th>
+                                    <th>Category</th>
+                                    <th>Check In</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for record in recent_attendance %}
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="bg-{{ record.employee.category.color }} bg-opacity-10 p-2 rounded me-3">
+                                                <i class="bi {{ record.employee.category.icon }} text-{{ record.employee.category.color }}"></i>
+                                            </div>
+                                            <div>
+                                                <strong>{{ record.employee.display_name }}</strong>
+                                                <br>
+                                                <small class="text-muted">{{ record.employee.employee_id }}</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-{{ record.employee.category.color }} bg-opacity-10 text-{{ record.employee.category.color }} px-3 py-2">
+                                            {{ record.employee.category.name }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        {% if record.is_late %}
+                                            <span class="text-warning">
+                                                <i class="bi bi-exclamation-triangle me-1"></i>
+                                                {{ record.check_in_time|time:"H:i" }}
+                                            </span>
+                                        {% else %}
+                                            {{ record.check_in_time|time:"H:i" }}
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if record.is_active %}
+                                            <span class="badge bg-success bg-opacity-10 text-success px-3 py-2">
+                                                <i class="bi bi-circle-fill me-1" style="font-size: 8px;"></i> Active
+                                            </span>
+                                        {% else %}
+                                            <span class="badge bg-info bg-opacity-10 text-info px-3 py-2">
+                                                <i class="bi bi-check-circle me-1"></i> Completed
+                                            </span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="4" class="text-center py-5 text-muted">
+                                        <i class="bi bi-inbox fs-1 d-block mb-3"></i>
+                                        No activity today yet
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                {% if recent_attendance %}
+                <div class="card-footer bg-white border-0 py-3">
+                    <small class="text-muted">
+                        <i class="bi bi-info-circle me-1"></i>
+                        Showing last {{ recent_attendance|length }} check-ins
+                    </small>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Right Sidebar -->
+        <div class="col-lg-4">
+            <!-- Birthdays -->
+            {% if birthdays_this_week %}
+            <div class="card border-0 mb-4">
+                <div class="card-header bg-white border-0 pt-4 px-4">
+                    <h5 class="mb-0">
+                        <i class="bi bi-gift-fill me-2 text-danger"></i>Birthdays This Week
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% for bday in birthdays_this_week %}
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="bg-danger bg-opacity-10 p-3 rounded me-3">
+                            <i class="bi bi-cake2 text-danger fs-5"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <strong>{{ bday.employee.display_name }}</strong>
+                            <br>
+                            <small class="text-muted">
+                                {% if bday.days_until == 0 %}
+                                    <span class="text-danger fw-bold">
+                                        <i class="bi bi-stars"></i> Today!
+                                    </span>
+                                {% elif bday.days_until == 1 %}
+                                    <i class="bi bi-calendar-event"></i> Tomorrow
+                                {% else %}
+                                    <i class="bi bi-calendar3"></i> In {{ bday.days_until }} days
+                                {% endif %}
+                                <span class="d-block small">{{ bday.date|date:"F j" }}</span>
+                            </small>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+            
+            <!-- Work Anniversaries -->
+            {% if anniversaries_this_week %}
+            <div class="card border-0 mb-4">
+                <div class="card-header bg-white border-0 pt-4 px-4">
+                    <h5 class="mb-0">
+                        <i class="bi bi-trophy-fill me-2 text-warning"></i>Work Anniversaries
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% for anniv in anniversaries_this_week %}
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="bg-warning bg-opacity-10 p-3 rounded me-3">
+                            <i class="bi bi-star-fill text-warning fs-5"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <strong>{{ anniv.employee.display_name }}</strong>
+                            <br>
+                            <small class="text-muted">
+                                <i class="bi bi-briefcase"></i> {{ anniv.years }} year{{ anniv.years|pluralize }}
+                                <br>
+                                {% if anniv.days_until == 0 %}
+                                    <span class="text-warning fw-bold">
+                                        <i class="bi bi-stars"></i> Today!
+                                    </span>
+                                {% elif anniv.days_until == 1 %}
+                                    <i class="bi bi-calendar-event"></i> Tomorrow
+                                {% else %}
+                                    <i class="bi bi-calendar3"></i> In {{ anniv.days_until }} days
+                                {% endif %}
+                            </small>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+            
+            <!-- Quick Actions -->
+            <div class="card border-0 mb-4">
+                <div class="card-header bg-white border-0 pt-4 px-4">
+                    <h5 class="mb-0">
+                        <i class="bi bi-lightning-charge me-2"></i>Quick Actions
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <a href="{% url 'employee_create' %}" class="btn btn-primary w-100 mb-2">
+                        <i class="bi bi-person-plus"></i> Add New Person
+                    </a>
+                    <a href="{% url 'manual_attendance_add' %}" class="btn btn-outline-secondary w-100 mb-2">
+                        <i class="bi bi-calendar-plus"></i> Manual Attendance
+                    </a>
+                    <a href="{% url 'attendance_reports' %}" class="btn btn-outline-info w-100">
+                        <i class="bi bi-file-spreadsheet"></i> View Reports
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Kiosk Info -->
+            <div class="card border-0 bg-light">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="bg-dark bg-opacity-10 p-3 rounded me-3">
+                            <i class="bi bi-qr-code fs-4"></i>
+                        </div>
+                        <div>
+                            <h6 class="mb-1">Kiosk Ready</h6>
+                            <p class="text-muted small mb-0">
+                                Employees can check in at:<br>
+                                <code>{{ request.build_absolute_uri }}{% url 'kiosk' %}</code>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .bg-purple {
+        background-color: #8b5cf6;
+    }
+    .stat-card {
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .stat-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    .stat-value {
+        font-size: 2.5rem;
+        font-weight: 700;
+    }
+    .badge {
+        font-weight: 500;
+    }
+    code {
+        background: #f1f5f9;
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-size: 12px;
+    }
+</style>
+{% endblock %}

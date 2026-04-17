@@ -1,0 +1,417 @@
+<!-- attendance/templates/attendance/employee_form.html -->
+{% extends 'attendance/base.html' %}
+
+{% block title %}{{ page_title }} | HR Management{% endblock %}
+
+{% block page_title %}{{ page_title }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid p-0">
+    <div class="row">
+        <div class="col-lg-10 mx-auto">
+            <div class="card border-0">
+                <div class="card-header bg-white border-0 pt-4 px-4">
+                    <h5 class="mb-0">
+                        <i class="bi bi-person-vcard me-2"></i>
+                        {% if action == 'Add' %}
+                            Add New Person
+                        {% else %}
+                            Edit Information
+                        {% endif %}
+                    </h5>
+                    <p class="text-muted mt-2 mb-0">
+                        <i class="bi bi-info-circle me-1"></i>
+                        Fields shown depend on the selected category (Staff, Intern, or Student).
+                    </p>
+                </div>
+                <div class="card-body px-4 pb-4">
+                    <form method="POST" id="employee-form">
+                        {% csrf_token %}
+                        
+                        {% if form.non_field_errors %}
+                        <div class="alert alert-danger">
+                            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                            {{ form.non_field_errors }}
+                        </div>
+                        {% endif %}
+                        
+                        <!-- Category Selection -->
+                        <div class="mb-4">
+                            <h6 class="text-uppercase text-muted mb-3 fw-bold small">
+                                <i class="bi bi-tag me-2"></i>Category
+                            </h6>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <label class="form-label">
+                                        <i class="bi bi-people"></i> Person Type
+                                    </label>
+                                    {{ form.category }}
+                                    {% if form.category.errors %}
+                                    <div class="text-danger small mt-1">
+                                        <i class="bi bi-exclamation-circle"></i> {{ form.category.errors.0 }}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Basic Information -->
+                        <div class="mb-4">
+                            <h6 class="text-uppercase text-muted mb-3 fw-bold small">
+                                <i class="bi bi-person me-2"></i>Basic Information
+                            </h6>
+                            <div class="row g-3">
+                                <div class="col-md-3">
+                                    <label class="form-label">
+                                        <i class="bi bi-person-badge"></i> Title
+                                    </label>
+                                    {{ form.title }}
+                                    {% if form.title.errors %}
+                                    <div class="text-danger small mt-1">
+                                        <i class="bi bi-exclamation-circle"></i> {{ form.title.errors.0 }}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label">
+                                        <i class="bi bi-person"></i> First Name
+                                    </label>
+                                    {{ form.first_name }}
+                                    {% if form.first_name.errors %}
+                                    <div class="text-danger small mt-1">
+                                        <i class="bi bi-exclamation-circle"></i> {{ form.first_name.errors.0 }}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-5">
+                                    <label class="form-label">
+                                        <i class="bi bi-person"></i> Last Name
+                                    </label>
+                                    {{ form.last_name }}
+                                    {% if form.last_name.errors %}
+                                    <div class="text-danger small mt-1">
+                                        <i class="bi bi-exclamation-circle"></i> {{ form.last_name.errors.0 }}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="row g-3 mt-2">
+                                <div class="col-md-4">
+                                    <label class="form-label">
+                                        <i class="bi bi-gender-ambiguous"></i> Gender
+                                    </label>
+                                    {{ form.gender }}
+                                    {% if form.gender.errors %}
+                                    <div class="text-danger small mt-1">
+                                        <i class="bi bi-exclamation-circle"></i> {{ form.gender.errors.0 }}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Contact Information -->
+                        <div class="mb-4">
+                            <h6 class="text-uppercase text-muted mb-3 fw-bold small">
+                                <i class="bi bi-envelope me-2"></i>Contact Information
+                            </h6>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label">
+                                        <i class="bi bi-envelope-at"></i> Work Email (for Kiosk)
+                                    </label>
+                                    {{ form.email }}
+                                    {% if form.email.errors %}
+                                    <div class="text-danger small mt-1">
+                                        <i class="bi bi-exclamation-circle"></i> {{ form.email.errors.0 }}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">
+                                        <i class="bi bi-envelope"></i> Personal Email (Optional)
+                                    </label>
+                                    {{ form.personal_email }}
+                                    {% if form.personal_email.errors %}
+                                    <div class="text-danger small mt-1">
+                                        <i class="bi bi-exclamation-circle"></i> {{ form.personal_email.errors.0 }}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="row g-3 mt-2">
+                                <div class="col-md-6">
+                                    <label class="form-label">
+                                        <i class="bi bi-telephone"></i> Phone Number
+                                    </label>
+                                    {{ form.phone }}
+                                    {% if form.phone.errors %}
+                                    <div class="text-danger small mt-1">
+                                        <i class="bi bi-exclamation-circle"></i> {{ form.phone.errors.0 }}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Work Information -->
+                        <div class="mb-4" id="work-info-section">
+                            <h6 class="text-uppercase text-muted mb-3 fw-bold small">
+                                <i class="bi bi-briefcase me-2"></i>Work Information
+                            </h6>
+                            <div class="row g-3">
+                                <div class="col-md-6" id="department-field">
+                                    <label class="form-label">
+                                        <i class="bi bi-diagram-3"></i> Department
+                                    </label>
+                                    {{ form.department }}
+                                    {% if form.department.errors %}
+                                    <div class="text-danger small mt-1">
+                                        <i class="bi bi-exclamation-circle"></i> {{ form.department.errors.0 }}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">
+                                        <i class="bi bi-briefcase"></i> Position / Role
+                                    </label>
+                                    {{ form.position }}
+                                    {% if form.position.errors %}
+                                    <div class="text-danger small mt-1">
+                                        <i class="bi bi-exclamation-circle"></i> {{ form.position.errors.0 }}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Dates -->
+                        <div class="mb-4">
+                            <h6 class="text-uppercase text-muted mb-3 fw-bold small">
+                                <i class="bi bi-calendar3 me-2"></i>Important Dates
+                            </h6>
+                            <div class="row g-3">
+                               <div class="col-md-4" id="dob-field">
+    <label class="form-label">
+        <i class="bi bi-cake2"></i> Date of Birth
+    </label>
+    {{ form.date_of_birth }}
+    {% if form.date_of_birth.errors %}
+    <div class="text-danger small mt-1">
+        <i class="bi bi-exclamation-circle"></i> {{ form.date_of_birth.errors.0 }}
+    </div>
+    {% endif %}
+    <small class="text-muted">Optional - For birthday reminders</small>
+</div>
+                                <div class="col-md-4" id="hire-date-field">
+                                    <label class="form-label" for="id_hire_date">
+                                        <i class="bi bi-calendar-check"></i> Hire Date
+                                    </label>
+                                    {{ form.hire_date }}
+                                    {% if form.hire_date.errors %}
+                                    <div class="text-danger small mt-1">
+                                        <i class="bi bi-exclamation-circle"></i> {{ form.hire_date.errors.0 }}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-4" id="end-date-field">
+                                    <label class="form-label">
+                                        <i class="bi bi-calendar-x"></i> End Date
+                                    </label>
+                                    {{ form.end_date }}
+                                    {% if form.end_date.errors %}
+                                    <div class="text-danger small mt-1">
+                                        <i class="bi bi-exclamation-circle"></i> {{ form.end_date.errors.0 }}
+                                    </div>
+                                    {% endif %}
+                                    <small class="text-muted">For Interns/Students only</small>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Intern/Student Information -->
+                        <div class="mb-4" id="intern-student-section">
+                            <h6 class="text-uppercase text-muted mb-3 fw-bold small">
+                                <i class="bi bi-mortarboard me-2"></i>Academic Information (Interns/Students)
+                            </h6>
+                            <div class="row g-3">
+                                <div class="col-md-6" id="institution-field">
+                                    <label class="form-label">
+                                        <i class="bi bi-building"></i> Institution
+                                    </label>
+                                    {{ form.institution }}
+                                    {% if form.institution.errors %}
+                                    <div class="text-danger small mt-1">
+                                        <i class="bi bi-exclamation-circle"></i> {{ form.institution.errors.0 }}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-6" id="field-of-study-field">
+                                    <label class="form-label">
+                                        <i class="bi bi-book"></i> Field of Study
+                                    </label>
+                                    {{ form.field_of_study }}
+                                    {% if form.field_of_study.errors %}
+                                    <div class="text-danger small mt-1">
+                                        <i class="bi bi-exclamation-circle"></i> {{ form.field_of_study.errors.0 }}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="row g-3 mt-2">
+                                <div class="col-md-6" id="student-id-field">
+                                    <label class="form-label">
+                                        <i class="bi bi-upc-scan"></i> Student ID
+                                    </label>
+                                    {{ form.student_id }}
+                                    {% if form.student_id.errors %}
+                                    <div class="text-danger small mt-1">
+                                        <i class="bi bi-exclamation-circle"></i> {{ form.student_id.errors.0 }}
+                                    </div>
+                                    {% endif %}
+                                    <small class="text-muted">Students only</small>
+                                </div>
+                                <div class="col-md-6" id="supervisor-field">
+                                    <label class="form-label">
+                                        <i class="bi bi-person-check"></i> Supervisor
+                                    </label>
+                                    {{ form.supervisor }}
+                                    {% if form.supervisor.errors %}
+                                    <div class="text-danger small mt-1">
+                                        <i class="bi bi-exclamation-circle"></i> {{ form.supervisor.errors.0 }}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Status -->
+                        <div class="mb-4">
+                            <h6 class="text-uppercase text-muted mb-3 fw-bold small">
+                                <i class="bi bi-toggle-on me-2"></i>Status
+                            </h6>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label">
+                                        <i class="bi bi-flag"></i> Employment Status
+                                    </label>
+                                    {{ form.employment_status }}
+                                    {% if form.employment_status.errors %}
+                                    <div class="text-danger small mt-1">
+                                        <i class="bi bi-exclamation-circle"></i> {{ form.employment_status.errors.0 }}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-check mt-4">
+                                        {{ form.is_active }}
+                                        <label class="form-check-label">
+                                            <i class="bi bi-check-circle"></i> Active (Can use Kiosk)
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Submit Buttons -->
+                        <hr class="my-4">
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary px-4">
+                                <i class="bi bi-check-lg"></i> {{ action }} Person
+                            </button>
+                            <a href="{% url 'employee_list' %}" class="btn btn-outline-secondary px-4">
+                                <i class="bi bi-x-lg"></i> Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Show/hide fields based on selected category
+    document.addEventListener('DOMContentLoaded', function() {
+        const categorySelect = document.getElementById('{{ form.category.id_for_label }}');
+        if (!categorySelect) return;
+        
+        // Field element IDs
+        const dobField = document.getElementById('{{ form.date_of_birth.id_for_label }}')?.closest('.col-md-4');
+        const departmentField = document.getElementById('{{ form.department.id_for_label }}')?.closest('.col-md-6');
+        const endDateField = document.getElementById('{{ form.end_date.id_for_label }}')?.closest('.col-md-4');
+        const institutionField = document.getElementById('{{ form.institution.id_for_label }}')?.closest('.col-md-6');
+        const fieldOfStudyField = document.getElementById('{{ form.field_of_study.id_for_label }}')?.closest('.col-md-6');
+        const studentIdField = document.getElementById('{{ form.student_id.id_for_label }}')?.closest('.col-md-6');
+        const supervisorField = document.getElementById('{{ form.supervisor.id_for_label }}')?.closest('.col-md-6');
+        const internStudentSection = document.getElementById('intern-student-section');
+        
+        const hireDateLabel = document.querySelector('label[for="id_hire_date"]');
+        
+        function updateFieldVisibility() {
+            const selectedOption = categorySelect.options[categorySelect.selectedIndex];
+            const selectedText = selectedOption ? selectedOption.text.toLowerCase() : '';
+            
+            let categoryCode = '';
+            if (selectedText.includes('staff')) {
+                categoryCode = 'STAFF';
+            } else if (selectedText.includes('intern')) {
+                categoryCode = 'INTERN';
+            } else if (selectedText.includes('student')) {
+                categoryCode = 'STUDENT';
+            }
+            
+         const staffOnlyFields = [departmentField];  // Removed dobField
+
+            
+            // Intern/Student fields
+            const internStudentFields = [endDateField, institutionField, fieldOfStudyField, supervisorField];
+            internStudentFields.forEach(field => {
+                if (field) {
+                    field.style.display = (categoryCode === 'INTERN' || categoryCode === 'STUDENT') ? 'block' : 'none';
+                }
+            });
+            
+            // Student-only field
+            if (studentIdField) {
+                studentIdField.style.display = categoryCode === 'STUDENT' ? 'block' : 'none';
+            }
+            
+            // Show/hide entire Intern/Student section
+            if (internStudentSection) {
+                internStudentSection.style.display = (categoryCode === 'INTERN' || categoryCode === 'STUDENT') ? 'block' : 'none';
+            }
+            
+            // Update hire_date label
+            if (hireDateLabel) {
+                if (categoryCode === 'STAFF') {
+                    hireDateLabel.innerHTML = '<i class="bi bi-calendar-check"></i> Hire Date';
+                } else {
+                    hireDateLabel.innerHTML = '<i class="bi bi-calendar-plus"></i> Start Date';
+                }
+            }
+            
+            // Update required attributes
+            const dobInput = document.getElementById('{{ form.date_of_birth.id_for_label }}');
+            const deptInput = document.getElementById('{{ form.department.id_for_label }}');
+            const endDateInput = document.getElementById('{{ form.end_date.id_for_label }}');
+            const institutionInput = document.getElementById('{{ form.institution.id_for_label }}');
+            const studentIdInput = document.getElementById('{{ form.student_id.id_for_label }}');
+            
+            if (dobInput) dobInput.required = (categoryCode === 'STAFF');
+            if (deptInput) deptInput.required = (categoryCode === 'STAFF');
+            if (endDateInput) endDateInput.required = (categoryCode === 'INTERN' || categoryCode === 'STUDENT');
+            if (institutionInput) institutionInput.required = (categoryCode === 'INTERN' || categoryCode === 'STUDENT');
+            if (studentIdInput) studentIdInput.required = (categoryCode === 'STUDENT');
+        }
+        
+        // Initial update
+        updateFieldVisibility();
+        
+        // Update on change
+        categorySelect.addEventListener('change', updateFieldVisibility);
+    });
+</script>
+{% endblock %}

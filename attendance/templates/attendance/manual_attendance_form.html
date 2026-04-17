@@ -1,0 +1,154 @@
+<!-- attendance/templates/attendance/manual_attendance_form.html -->
+{% extends 'attendance/base.html' %}
+
+{% block title %}Add Attendance | HR Management{% endblock %}
+
+{% block page_title %}Manual Attendance Entry{% endblock %}
+
+{% block content %}
+<div class="container-fluid p-0">
+    <div class="row">
+        <div class="col-lg-7 mx-auto">
+            <div class="card border-0">
+                <div class="card-header bg-white border-0 pt-4 px-4">
+                    <h5 class="mb-0">
+                        <i class="bi bi-calendar-plus me-2"></i>
+                        Add Manual Attendance Record
+                    </h5>
+                    <p class="text-muted mt-2 mb-0">
+                        <i class="bi bi-info-circle me-1"></i>
+                        Use this form to manually add or correct attendance records.
+                    </p>
+                </div>
+                <div class="card-body px-4 pb-4">
+                    <form method="POST">
+                        {% csrf_token %}
+                        
+                        {% if form.non_field_errors %}
+                        <div class="alert alert-danger">
+                            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                            {{ form.non_field_errors }}
+                        </div>
+                        {% endif %}
+                        
+                        <div class="mb-4">
+                            <label class="form-label">
+                                <i class="bi bi-person"></i> Select Employee
+                            </label>
+                            {{ form.employee }}
+                            {% if form.employee.errors %}
+                            <div class="text-danger small mt-1">
+                                <i class="bi bi-exclamation-circle"></i> {{ form.employee.errors.0 }}
+                            </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6">
+                                <label class="form-label">
+                                    <i class="bi bi-box-arrow-in-right"></i> Check In Time
+                                </label>
+                                {{ form.check_in_time }}
+                                {% if form.check_in_time.errors %}
+                                <div class="text-danger small mt-1">
+                                    <i class="bi bi-exclamation-circle"></i> {{ form.check_in_time.errors.0 }}
+                                </div>
+                                {% endif %}
+                                {% if form.check_in_time.help_text %}
+                                <small class="text-muted d-block mt-1">
+                                    <i class="bi bi-question-circle"></i> {{ form.check_in_time.help_text }}
+                                </small>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">
+                                    <i class="bi bi-box-arrow-right"></i> Check Out Time (Optional)
+                                </label>
+                                {{ form.check_out_time }}
+                                {% if form.check_out_time.errors %}
+                                <div class="text-danger small mt-1">
+                                    <i class="bi bi-exclamation-circle"></i> {{ form.check_out_time.errors.0 }}
+                                </div>
+                                {% endif %}
+                                {% if form.check_out_time.help_text %}
+                                <small class="text-muted d-block mt-1">
+                                    <i class="bi bi-question-circle"></i> {{ form.check_out_time.help_text }}
+                                </small>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <!-- Info Alert -->
+                        <div class="alert alert-info bg-info bg-opacity-10 border-0">
+                            <div class="d-flex">
+                                <div class="me-3">
+                                    <i class="bi bi-lightbulb-fill fs-4"></i>
+                                </div>
+                                <div>
+                                    <strong>Important Notes:</strong>
+                                    <ul class="mb-0 mt-1 small">
+                                        <li>Check-in time is required and cannot be in the future</li>
+                                        <li>Check-out time must be after check-in time</li>
+                                        <li>Leave check-out blank if the employee is currently working</li>
+                                        <li>This will create a new attendance record separate from kiosk entries</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Submit Buttons -->
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-success px-4">
+                                <i class="bi bi-save"></i> Save Attendance Record
+                            </button>
+                            <a href="{% url 'attendance_reports' %}" class="btn btn-outline-secondary px-4">
+                                <i class="bi bi-x-lg"></i> Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Quick Tips Card -->
+            <div class="card border-0 mt-4">
+                <div class="card-header bg-white border-0 pt-4 px-4">
+                    <h6 class="mb-0">
+                        <i class="bi bi-lightbulb me-2"></i>Common Use Cases
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <div class="p-3 bg-light rounded">
+                                <i class="bi bi-wifi-off text-warning fs-5"></i>
+                                <p class="small mt-2 mb-0">
+                                    <strong>Missed Check-in</strong><br>
+                                    Employee forgot to scan QR code in the morning
+                                </p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="p-3 bg-light rounded">
+                                <i class="bi bi-bug text-danger fs-5"></i>
+                                <p class="small mt-2 mb-0">
+                                    <strong>System Error</strong><br>
+                                    Kiosk was down or QR code didn't work
+                                </p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="p-3 bg-light rounded">
+                                <i class="bi bi-pencil text-primary fs-5"></i>
+                                <p class="small mt-2 mb-0">
+                                    <strong>Correction</strong><br>
+                                    Fix incorrect check-in or check-out times
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

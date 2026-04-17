@@ -1,0 +1,226 @@
+<!-- attendance/templates/attendance/reports.html -->
+{% extends 'attendance/base.html' %}
+
+{% block title %}Reports & Analytics | HR Management{% endblock %}
+
+{% block page_title %}Reports & Analytics{% endblock %}
+
+{% block content %}
+<div class="container-fluid p-0">
+    
+    <!-- Summary Cards -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-3">
+            <div class="card border-0 h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <small class="text-muted text-uppercase fw-semibold">Total Employees</small>
+                            <h3 class="mt-2 mb-0">{{ total_employees }}</h3>
+                        </div>
+                        <div class="bg-primary bg-opacity-10 p-3 rounded">
+                            <i class="bi bi-people-fill fs-4 text-primary"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <small class="text-muted text-uppercase fw-semibold">Avg Daily Hours</small>
+                            <h3 class="mt-2 mb-0">7.5</h3>
+                        </div>
+                        <div class="bg-success bg-opacity-10 p-3 rounded">
+                            <i class="bi bi-clock-fill fs-4 text-success"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <small class="text-muted text-uppercase fw-semibold">Attendance Rate</small>
+                            <h3 class="mt-2 mb-0">
+                                {% if total_employees > 0 %}
+                                    {% widthratio checked_in_count|add:checked_out_count total_employees 100 %}%
+                                {% else %}
+                                    0%
+                                {% endif %}
+                            </h3>
+                        </div>
+                        <div class="bg-warning bg-opacity-10 p-3 rounded">
+                            <i class="bi bi-graph-up fs-4 text-warning"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <small class="text-muted text-uppercase fw-semibold">Departments</small>
+                            <h3 class="mt-2 mb-0">{{ department_summary|length }}</h3>
+                        </div>
+                        <div class="bg-info bg-opacity-10 p-3 rounded">
+                            <i class="bi bi-diagram-3 fs-4 text-info"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row g-4">
+        <!-- Monthly Summary -->
+        <div class="col-lg-8">
+            <div class="card border-0">
+                <div class="card-header bg-white border-0 pt-4 px-4">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">
+                            <i class="bi bi-calendar-month me-2"></i>Monthly Attendance Summary
+                        </h5>
+                        <span class="badge bg-primary bg-opacity-10 text-primary px-3 py-2">
+                            {{ today|date:"F Y" }}
+                        </span>
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Employee</th>
+                                    <th>Department</th>
+                                    <th>Days Present</th>
+                                    <th>Total Hours</th>
+                                    <th>Avg Hours/Day</th>
+                                </tr>
+                            </thead>
+                        <tbody>
+    {% for stat in monthly_stats %}
+    <tr>
+        <td>
+            <div class="d-flex align-items-center">
+                <div class="bg-primary bg-opacity-10 p-2 rounded me-3">
+                    <i class="bi bi-person text-primary"></i>
+                </div>
+                {{ stat.name }}
+            </div>
+        </td>
+        <td>{{ stat.department }}</td>
+        <td>{{ stat.days_present }}</td>
+        <td>{{ stat.total_hours|floatformat:1 }} hrs</td>
+        <td>{{ stat.avg_hours }} hrs</td>
+    </tr>
+    {% empty %}
+    <tr>
+        <td colspan="5" class="text-center py-5 text-muted">
+            <i class="bi bi-calendar-x fs-1 d-block mb-3"></i>
+            No data available for this month
+        </td>
+    </tr>
+    {% endfor %}
+</tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Export Options -->
+        <div class="col-lg-4">
+            <div class="card border-0 mb-4">
+                <div class="card-header bg-white border-0 pt-4 px-4">
+                    <h5 class="mb-0">
+                        <i class="bi bi-download me-2"></i>Export Reports
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="list-group list-group-flush">
+                        <div class="list-group-item bg-transparent px-0">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <i class="bi bi-file-spreadsheet fs-5 text-success me-2"></i>
+                                    <strong>Attendance Report</strong>
+                                    <p class="text-muted small mb-0">Export all attendance records as CSV</p>
+                                </div>
+                                <a href="{% url 'export_attendance_csv' %}" class="btn btn-outline-success btn-sm">
+                                    <i class="bi bi-download"></i> Export
+                                </a>
+                            </div>
+                        </div>
+                        <div class="list-group-item bg-transparent px-0">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <i class="bi bi-file-pdf fs-5 text-danger me-2"></i>
+                                    <strong>Employee Directory</strong>
+                                    <p class="text-muted small mb-0">Coming soon</p>
+                                </div>
+                                <button class="btn btn-outline-secondary btn-sm" disabled>
+                                    <i class="bi bi-download"></i> Export
+                                </button>
+                            </div>
+                        </div>
+                        <div class="list-group-item bg-transparent px-0">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <i class="bi bi-graph-up fs-5 text-primary me-2"></i>
+                                    <strong>Monthly Summary</strong>
+                                    <p class="text-muted small mb-0">Coming soon</p>
+                                </div>
+                                <button class="btn btn-outline-secondary btn-sm" disabled>
+                                    <i class="bi bi-download"></i> Export
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Quick Stats -->
+            <div class="card border-0">
+                <div class="card-header bg-white border-0 pt-4 px-4">
+                    <h5 class="mb-0">
+                        <i class="bi bi-bar-chart me-2"></i>Quick Statistics
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="text-muted small text-uppercase fw-semibold">Attendance Today</label>
+                        <div class="progress mt-2" style="height: 8px;">
+                            {% if total_employees > 0 %}
+                                {% with present_percent=checked_in_count|add:checked_out_count %}
+                                    {% widthratio present_percent total_employees 100 as percent %}
+                                    <div class="progress-bar bg-success" style="width: {{ percent }}%"></div>
+                                {% endwith %}
+                            {% endif %}
+                        </div>
+                        <div class="d-flex justify-content-between mt-1">
+                            <small>{{ checked_in_count|add:checked_out_count }} Present</small>
+                            <small>{{ absent_count }} Absent</small>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="text-muted small text-uppercase fw-semibold">Currently Working</label>
+                        <h4 class="mb-0">{{ checked_in_count }} <small class="text-muted fs-6">employees</small></h4>
+                    </div>
+                    
+                    <div>
+                        <label class="text-muted small text-uppercase fw-semibold">Completed Today</label>
+                        <h4 class="mb-0">{{ checked_out_count }} <small class="text-muted fs-6">employees</small></h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
