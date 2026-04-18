@@ -61,14 +61,16 @@ def kiosk_view(request):
             return redirect('kiosk')
         
         now = timezone.now()
-        today = now.date()
+        local_now = timezone.localtime(now)
+        today = local_now.date()
         
         if action == 'check_in':
             if employee.is_checked_in_today:
                 record = employee.today_attendance
+                record_local_in = timezone.localtime(record.check_in_time) if record else None
                 messages.warning(
                     request, 
-                    f'{employee.first_name}, you are already checked in since {record.check_in_time.strftime("%H:%M")}.'
+                    f'{employee.first_name}, you are already checked in since {record_local_in.strftime("%H:%M")}.'
                 )
                 return redirect('kiosk')
             
@@ -78,7 +80,7 @@ def kiosk_view(request):
             )
             messages.success(
                 request, 
-                f'Welcome, {employee.first_name}! You checked in at {now.strftime("%H:%M")}.'
+                f'Welcome, {employee.first_name}! You checked in at {local_now.strftime("%H:%M")}.'
             )
             
         elif action == 'check_out':
@@ -97,7 +99,7 @@ def kiosk_view(request):
             hours = record.hours_worked
             messages.success(
                 request, 
-                f'Goodbye, {employee.first_name}! You checked out at {now.strftime("%H:%M")}. '
+                f'Goodbye, {employee.first_name}! You checked out at {local_now.strftime("%H:%M")}. '
                 f'Hours worked: {hours} hrs.'
             )
         

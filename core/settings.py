@@ -212,7 +212,8 @@ USE_TZ = True
 
 STATIC_URL = os.getenv("DJANGO_STATIC_URL", "/static/")
 STATIC_ROOT = _env_str("DJANGO_STATIC_ROOT")
-STATICFILES_DIRS = [BASE_DIR / "static"]
+_static_dir = BASE_DIR / "static"
+STATICFILES_DIRS = [_static_dir] if _static_dir.exists() else []
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field

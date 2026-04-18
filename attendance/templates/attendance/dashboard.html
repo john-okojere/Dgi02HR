@@ -9,94 +9,94 @@
 <div class="container-fluid p-0">
     
     <!-- Overall Stats Cards -->
-    <div class="row g-4 mb-4">
-        <div class="col-md-2">
-            <div class="card stat-card border-0 h-100">
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-6 g-4 mb-4">
+        <div class="col">
+            <div class="card metric-card h-100">
                 <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-start">
+                    <div class="d-flex justify-content-between align-items-start gap-3">
                         <div>
-                            <small class="text-uppercase text-muted fw-semibold">Total People</small>
-                            <div class="stat-value mt-2">{{ total_employees }}</div>
+                            <div class="metric-label">Total People</div>
+                            <div class="metric-value">{{ total_employees }}</div>
                         </div>
-                        <div class="bg-primary bg-opacity-10 p-3 rounded">
-                            <i class="bi bi-people-fill fs-4 text-primary"></i>
+                        <div class="metric-icon bg-primary bg-opacity-10 text-primary">
+                            <i class="bi bi-people-fill"></i>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        
-        <div class="col-md-2">
-            <div class="card stat-card border-0 h-100" style="border-left-color: #10b981;">
+
+        <div class="col">
+            <div class="card metric-card h-100 metric-accent-success">
                 <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-start">
+                    <div class="d-flex justify-content-between align-items-start gap-3">
                         <div>
-                            <small class="text-uppercase text-muted fw-semibold">Present</small>
-                            <div class="stat-value mt-2 text-success">{{ checked_in_count }}</div>
+                            <div class="metric-label">Present</div>
+                            <div class="metric-value text-success">{{ checked_in_count }}</div>
                         </div>
-                        <div class="bg-success bg-opacity-10 p-3 rounded">
-                            <i class="bi bi-box-arrow-in-right fs-4 text-success"></i>
+                        <div class="metric-icon bg-success bg-opacity-10 text-success">
+                            <i class="bi bi-box-arrow-in-right"></i>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        
-        <div class="col-md-2">
-            <div class="card stat-card border-0 h-100" style="border-left-color: #f59e0b;">
+
+        <div class="col">
+            <div class="card metric-card h-100 metric-accent-warning">
                 <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-start">
+                    <div class="d-flex justify-content-between align-items-start gap-3">
                         <div>
-                            <small class="text-uppercase text-muted fw-semibold">Late Today</small>
-                            <div class="stat-value mt-2 text-warning">{{ late_count }}</div>
+                            <div class="metric-label">Late Today</div>
+                            <div class="metric-value text-warning">{{ late_count }}</div>
                         </div>
-                        <div class="bg-warning bg-opacity-10 p-3 rounded">
-                            <i class="bi bi-clock-history fs-4 text-warning"></i>
+                        <div class="metric-icon bg-warning bg-opacity-10 text-warning">
+                            <i class="bi bi-clock-history"></i>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        
-        <div class="col-md-2">
-            <div class="card stat-card border-0 h-100" style="border-left-color: #3b82f6;">
+
+        <div class="col">
+            <div class="card metric-card h-100 metric-accent-info">
                 <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-start">
+                    <div class="d-flex justify-content-between align-items-start gap-3">
                         <div>
-                            <small class="text-uppercase text-muted fw-semibold">Completed</small>
-                            <div class="stat-value mt-2 text-info">{{ checked_out_count }}</div>
+                            <div class="metric-label">Completed</div>
+                            <div class="metric-value text-info">{{ checked_out_count }}</div>
                         </div>
-                        <div class="bg-info bg-opacity-10 p-3 rounded">
-                            <i class="bi bi-check-circle fs-4 text-info"></i>
+                        <div class="metric-icon bg-info bg-opacity-10 text-info">
+                            <i class="bi bi-check-circle"></i>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        
-        <div class="col-md-2">
-            <div class="card stat-card border-0 h-100" style="border-left-color: #ef4444;">
+
+        <div class="col">
+            <div class="card metric-card h-100 metric-accent-danger">
                 <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-start">
+                    <div class="d-flex justify-content-between align-items-start gap-3">
                         <div>
-                            <small class="text-uppercase text-muted fw-semibold">Absent</small>
-                            <div class="stat-value mt-2 text-danger">{{ absent_count }}</div>
+                            <div class="metric-label">Absent</div>
+                            <div class="metric-value text-danger">{{ absent_count }}</div>
                         </div>
-                        <div class="bg-danger bg-opacity-10 p-3 rounded">
-                            <i class="bi bi-person-x fs-4 text-danger"></i>
+                        <div class="metric-icon bg-danger bg-opacity-10 text-danger">
+                            <i class="bi bi-person-x"></i>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        
-        <div class="col-md-2">
-            <div class="card stat-card border-0 h-100" style="border-left-color: #8b5cf6;">
+
+        <div class="col">
+            <div class="card metric-card h-100 metric-accent-primary">
                 <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-start">
+                    <div class="d-flex justify-content-between align-items-start gap-3">
                         <div>
-                            <small class="text-uppercase text-muted fw-semibold">Attendance</small>
-                            <div class="stat-value mt-2">
+                            <div class="metric-label">Attendance</div>
+                            <div class="metric-value">
                                 {% if total_employees > 0 %}
                                     {% widthratio checked_in_count|add:checked_out_count total_employees 100 %}%
                                 {% else %}
@@ -104,8 +104,8 @@
                                 {% endif %}
                             </div>
                         </div>
-                        <div class="bg-purple bg-opacity-10 p-3 rounded">
-                            <i class="bi bi-pie-chart fs-4" style="color: #8b5cf6;"></i>
+                        <div class="metric-icon bg-primary bg-opacity-10 text-primary">
+                            <i class="bi bi-pie-chart"></i>
                         </div>
                     </div>
                 </div>
@@ -363,20 +363,59 @@
 </div>
 
 <style>
-    .bg-purple {
-        background-color: #8b5cf6;
+    .metric-card {
+        overflow: hidden;
     }
-    .stat-card {
-        transition: transform 0.2s, box-shadow 0.2s;
+    .metric-card::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 6px;
+        background: rgba(2, 6, 23, 0.12);
     }
-    .stat-card:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    }
-    .stat-value {
-        font-size: 2.5rem;
+    .metric-accent-primary::before { background: rgba(2, 6, 23, 0.9); }
+    .metric-accent-success::before { background: rgba(var(--bs-success-rgb), 0.9); }
+    .metric-accent-warning::before { background: rgba(var(--bs-warning-rgb), 0.9); }
+    .metric-accent-danger::before { background: rgba(var(--bs-danger-rgb), 0.9); }
+    .metric-accent-info::before { background: rgba(var(--bs-info-rgb), 0.9); }
+
+    .metric-label {
+        font-size: 0.78rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: rgba(2, 6, 23, 0.55);
         font-weight: 700;
     }
+    .metric-value {
+        font-size: 2.6rem;
+        font-weight: 750;
+        margin-top: 10px;
+        line-height: 1.1;
+    }
+    .metric-icon {
+        width: 56px;
+        height: 56px;
+        border-radius: 14px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        flex: 0 0 auto;
+    }
+    .metric-icon i {
+        font-size: 1.6rem;
+        line-height: 1;
+    }
+
+    .metric-card {
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .metric-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 20px 45px rgba(0,0,0,0.18);
+    }
+
     .badge {
         font-weight: 500;
     }

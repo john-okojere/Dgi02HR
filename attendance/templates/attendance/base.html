@@ -14,14 +14,34 @@
     
     <style>
         :root {
-            --primary-color: #4361ee;
-            --success-color: #10b981;
-            --warning-color: #f59e0b;
-            --danger-color: #ef4444;
-            --dark-color: #1e293b;
-            --light-bg: #f8fafc;
+            --primary-color: #020617;
+            --primary-soft: rgba(2, 6, 23, 0.08);
+            --dark-color: #020617;
+            --text-color: #0f172a;
+            --muted-color: #64748b;
+            --surface: rgba(255,255,255,0.96);
+            --surface-2: rgba(255,255,255,0.92);
+            --border-color: rgba(148,163,184,0.35);
+            --shadow: 0 30px 80px rgba(0,0,0,0.35);
+            --shadow-soft: 0 10px 25px rgba(0,0,0,0.16);
             --sidebar-width: 280px;
             --sidebar-collapsed-width: 0px;
+
+            /* Bootstrap theme colors (semantic accents) */
+            --bs-primary: #020617;
+            --bs-primary-rgb: 2,6,23;
+            --bs-success: #22c55e;
+            --bs-success-rgb: 34,197,94;
+            --bs-info: #3b82f6;
+            --bs-info-rgb: 59,130,246;
+            --bs-warning: #f59e0b;
+            --bs-warning-rgb: 245,158,11;
+            --bs-danger: #ef4444;
+            --bs-danger-rgb: 239,68,68;
+            --bs-secondary: #475569;
+            --bs-secondary-rgb: 71,85,105;
+            --bs-dark: #020617;
+            --bs-dark-rgb: 2,6,23;
         }
         
         * {
@@ -32,22 +52,27 @@
         
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background-color: var(--light-bg);
+            background: radial-gradient(circle at top, #1e293b, #020617);
             min-height: 100vh;
             overflow-x: hidden;
+            color: var(--text-color);
         }
+
+        /* Keep Bootstrap utilities working (bg-opacity-* etc) by using CSS variables above. */
         
         /* Mobile Header */
         .mobile-header {
             display: none;
-            background: white;
+            background: var(--surface-2);
+            backdrop-filter: blur(10px);
             padding: 12px 16px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            box-shadow: var(--shadow-soft);
             position: fixed;
             top: 0;
             left: 0;
             right: 0;
             z-index: 1000;
+            border-bottom: 1px solid var(--border-color);
         }
         
         .mobile-header .menu-toggle {
@@ -68,9 +93,10 @@
         
         /* Sidebar */
         .sidebar {
-            background: white;
+            background: var(--surface-2);
+            backdrop-filter: blur(10px);
             min-height: 100vh;
-            box-shadow: 2px 0 10px rgba(0,0,0,0.05);
+            box-shadow: var(--shadow-soft);
             position: fixed;
             width: var(--sidebar-width);
             left: 0;
@@ -78,6 +104,7 @@
             z-index: 999;
             transition: transform 0.3s ease;
             overflow-y: auto;
+            border-right: 1px solid var(--border-color);
         }
         
         .sidebar.closed {
@@ -101,7 +128,7 @@
         
         .sidebar-brand {
             padding: 24px 20px;
-            border-bottom: 1px solid #e2e8f0;
+            border-bottom: 1px solid var(--border-color);
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -132,7 +159,7 @@
         .nav-link {
             padding: 12px 16px;
             border-radius: 8px;
-            color: #64748b;
+            color: var(--muted-color);
             font-weight: 500;
             transition: all 0.3s;
             margin-bottom: 4px;
@@ -149,13 +176,14 @@
         }
         
         .nav-link:hover {
-            background-color: #f1f5f9;
+            background-color: rgba(2, 6, 23, 0.06);
             color: var(--primary-color);
         }
         
         .nav-link.active {
-            background-color: var(--primary-color);
+            background: linear-gradient(135deg, #020617, #1e293b);
             color: white;
+            box-shadow: 0 8px 20px rgba(2,6,23,0.25);
         }
         
         /* Main Content */
@@ -171,29 +199,34 @@
         }
         
         .top-bar {
-            background: white;
+            background: var(--surface);
+            backdrop-filter: blur(10px);
             padding: 16px 24px;
             border-radius: 12px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            box-shadow: var(--shadow-soft);
             margin-bottom: 30px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
             gap: 16px;
+            border: 1px solid var(--border-color);
         }
         
         /* Cards */
         .card {
             border: none;
-            border-radius: 12px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            border-radius: 18px;
+            background: var(--surface);
+            backdrop-filter: blur(10px);
+            box-shadow: var(--shadow-soft);
             transition: transform 0.2s, box-shadow 0.2s;
             margin-bottom: 20px;
+            border: 1px solid var(--border-color);
         }
         
         .card:hover {
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            box-shadow: var(--shadow);
         }
         
         .stat-card {
@@ -219,8 +252,8 @@
         }
         
         .table th {
-            background: #f8fafc;
-            color: #475569;
+            background: rgba(2, 6, 23, 0.03);
+            color: rgba(2, 6, 23, 0.75);
             font-weight: 600;
             font-size: 0.875rem;
             text-transform: uppercase;
@@ -233,20 +266,21 @@
         .table td {
             padding: 16px;
             vertical-align: middle;
-            color: #334155;
+            color: rgba(2, 6, 23, 0.9);
         }
         
         /* Forms */
         .form-control, .form-select {
             border-radius: 8px;
-            border: 1px solid #e2e8f0;
+            border: 1px solid var(--border-color);
             padding: 10px 14px;
             font-size: 16px;
+            background: rgba(248,250,252,0.85);
         }
         
         .form-control:focus, .form-select:focus {
             border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
+            box-shadow: 0 0 0 3px rgba(2, 6, 23, 0.12);
         }
         
         /* Buttons */
@@ -258,13 +292,24 @@
         }
         
         .btn-primary {
-            background: var(--primary-color);
-            border-color: var(--primary-color);
+            background: linear-gradient(135deg, #020617, #1e293b);
+            border-color: #020617;
         }
         
         .btn-primary:hover {
-            background: #3151d4;
-            border-color: #3151d4;
+            background: linear-gradient(135deg, #0b1220, #26364f);
+            border-color: #0b1220;
+        }
+
+        .btn-outline-secondary {
+            border-color: rgba(2, 6, 23, 0.25) !important;
+            color: rgba(2, 6, 23, 0.85) !important;
+        }
+
+        .btn-outline-secondary:hover {
+            background: rgba(2, 6, 23, 0.06) !important;
+            border-color: rgba(2, 6, 23, 0.35) !important;
+            color: rgba(2, 6, 23, 0.95) !important;
         }
         
         /* Alerts */
