@@ -160,11 +160,23 @@ DB_HOST = _env_str("DJANGO_DB_HOST")
 DB_PORT = _env_str("DJANGO_DB_PORT")
 
 DATABASES = {
-    'default': {
-        'ENGINE': DB_ENGINE,
-        'NAME': DB_NAME or (BASE_DIR / 'db.sqlite3'),
-    }
+    # 'default': {
+    #     'ENGINE': DB_ENGINE,
+    #     'NAME': DB_NAME or (BASE_DIR / 'db.sqlite3'),
+    # }
+
+
+    "default": {
+        "ENGINE": "django.db.backends.mysql",
+        "NAME": os.getenv("DJANGO_DB_NAME"),
+        "USER": os.getenv("DJANGO_DB_USER"),
+        "PASSWORD": os.getenv("DJANGO_DB_PASSWORD"),
+        "HOST": os.getenv("DJANGO_DB_HOST"),
+        "PORT": os.getenv("DJANGO_DB_PORT"),
+    },
+
 }
+
 
 if DB_ENGINE != "django.db.backends.sqlite3":
     DATABASES["default"].update(
