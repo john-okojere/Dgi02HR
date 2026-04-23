@@ -17,6 +17,7 @@ urlpatterns = [
     
     # Dashboard
     path('dashboard/', views.dashboard_view, name='dashboard'),
+    path('dashboard/category/<str:code>/', views.category_dashboard, name='category_dashboard'),
     
     # Employee Management
     path('employees/', views.employee_list, name='employee_list'),

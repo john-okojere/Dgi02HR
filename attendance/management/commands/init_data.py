@@ -42,11 +42,9 @@ class Command(BaseCommand):
 
         # Create Departments
         departments = [
-            {'name': 'Engineering', 'code': 'ENG'},
-            {'name': 'Human Resources', 'code': 'HR'},
+            {'name': 'Accounting', 'code': 'ACCT'},
             {'name': 'Administration', 'code': 'ADMIN'},
-            {'name': 'Management', 'code': 'MGT'},
-            {'name': 'Technical', 'code': 'TECH'},
+            {'name': 'IT', 'code': 'TECH'},
         ]
 
         for dept_data in departments:

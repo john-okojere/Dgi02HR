@@ -7,48 +7,98 @@
 
 {% block content %}
 <div class="container-fluid p-0">
-    
-    <!-- Filter Card -->
+    <div class="row g-4 mb-4">
+        <div class="col-sm-6 col-xl-3">
+            <div class="card border-0 h-100">
+                <div class="card-body">
+                    <small class="text-muted text-uppercase fw-semibold">Filtered Records</small>
+                    <h3 class="mt-2 mb-0">{{ records|length }}</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-xl-3">
+            <div class="card border-0 h-100">
+                <div class="card-body">
+                    <small class="text-muted text-uppercase fw-semibold">Late Check-Ins</small>
+                    <h3 class="mt-2 mb-0 text-warning">{{ late_records }}</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-xl-3">
+            <div class="card border-0 h-100">
+                <div class="card-body">
+                    <small class="text-muted text-uppercase fw-semibold">Completed Hours</small>
+                    <h3 class="mt-2 mb-0">{{ total_hours }}</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-xl-3">
+            <div class="card border-0 h-100">
+                <div class="card-body">
+                    <small class="text-muted text-uppercase fw-semibold">Export Ready</small>
+                    <h3 class="mt-2 mb-0 text-primary">CSV</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="card border-0 mb-4">
         <div class="card-body">
             <form method="GET" class="row g-3 align-items-end">
-                <div class="col-md-3">
-                    <label class="form-label">
-                        <i class="bi bi-calendar3"></i> Single Date
-                    </label>
+                <div class="col-12 col-lg-3">
+                    <label class="form-label"><i class="bi bi-search"></i> Search</label>
+                    {{ date_form.search }}
+                </div>
+                <div class="col-6 col-lg-2">
+                    <label class="form-label"><i class="bi bi-calendar3"></i> Date</label>
                     {{ date_form.date }}
                 </div>
-                <div class="col-md-3">
-                    <label class="form-label">
-                        <i class="bi bi-calendar-range"></i> Date Range
-                    </label>
+                <div class="col-6 col-lg-3">
+                    <label class="form-label"><i class="bi bi-calendar-range"></i> Range</label>
                     <div class="d-flex gap-2">
                         {{ date_form.start_date }}
                         {{ date_form.end_date }}
                     </div>
                 </div>
-                <div class="col-md-3">
-                    <label class="form-label">
-                        <i class="bi bi-person"></i> Employee
-                    </label>
+                <div class="col-6 col-lg-2">
+                    <label class="form-label"><i class="bi bi-diagram-3"></i> Department</label>
+                    {{ date_form.department }}
+                </div>
+                <div class="col-6 col-lg-2">
+                    <label class="form-label"><i class="bi bi-collection"></i> Category</label>
+                    {{ date_form.category }}
+                </div>
+                <div class="col-6 col-lg-3">
+                    <label class="form-label"><i class="bi bi-person"></i> Person</label>
                     {{ date_form.employee }}
                 </div>
-                <div class="col-md-3">
-                    <button type="submit" class="btn btn-primary w-100">
-                        <i class="bi bi-funnel-fill"></i> Apply Filters
-                    </button>
-                    <a href="{% url 'attendance_reports' %}" class="btn btn-outline-secondary w-100 mt-2">
-                        <i class="bi bi-arrow-counterclockwise"></i> Reset
-                    </a>
+                <div class="col-6 col-lg-3">
+                    <label class="form-label"><i class="bi bi-person-badge"></i> Employment Status</label>
+                    {{ date_form.employment_status }}
+                </div>
+                <div class="col-12 col-lg-6">
+                    <div class="d-flex gap-2 flex-wrap justify-content-lg-end">
+                        <a href="{% url 'manual_attendance_add' %}" class="btn btn-success flex-fill flex-lg-grow-0">
+                            <i class="bi bi-plus-circle"></i> Add Manual Entry
+                        </a>
+                        <button type="submit" class="btn btn-primary flex-fill flex-lg-grow-0">
+                            <i class="bi bi-funnel-fill"></i> Apply Filters
+                        </button>
+                        <a href="{% url 'export_attendance_csv' %}?{{ request.GET.urlencode }}" class="btn btn-outline-primary flex-fill flex-lg-grow-0">
+                            <i class="bi bi-download"></i> Export CSV
+                        </a>
+                        <a href="{% url 'attendance_reports' %}" class="btn btn-outline-secondary flex-fill flex-lg-grow-0">
+                            <i class="bi bi-arrow-counterclockwise"></i> Reset
+                        </a>
+                    </div>
                 </div>
             </form>
         </div>
     </div>
-    
-    <!-- Actions Bar -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
+
+    <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-2 mb-4">
         <div>
-            <h5 class="mb-0">
+            <h5 class="mb-1">
                 <i class="bi bi-list-ul me-2"></i>
                 {% if date_form.cleaned_data.date %}
                     Records for {{ date_form.cleaned_data.date|date:"F j, Y" }}
@@ -58,18 +108,10 @@
                     Today's Records
                 {% endif %}
             </h5>
-        </div>
-        <div>
-            <a href="{% url 'manual_attendance_add' %}" class="btn btn-success me-2">
-                <i class="bi bi-plus-circle"></i> Add Manual Entry
-            </a>
-            <a href="{% url 'export_attendance_csv' %}?{{ request.GET.urlencode }}" class="btn btn-outline-primary">
-                <i class="bi bi-download"></i> Export CSV
-            </a>
+            <small class="text-muted">All filters are respected in the export.</small>
         </div>
     </div>
-    
-    <!-- Attendance Table -->
+
     <div class="card border-0">
         <div class="card-body p-0">
             <div class="table-responsive">
@@ -94,13 +136,16 @@
                             </td>
                             <td>
                                 <div class="d-flex align-items-center">
-                                    <div class="bg-primary bg-opacity-10 p-2 rounded me-3">
-                                        <i class="bi bi-person text-primary"></i>
+                                    <div class="bg-{{ record.employee.category.color }} bg-opacity-10 p-2 rounded me-3">
+                                        <i class="bi {{ record.employee.category.icon }} text-{{ record.employee.category.color }}"></i>
                                     </div>
-                                    {{ record.employee.full_name }}
+                                    <div>
+                                        <strong>{{ record.employee.full_name }}</strong>
+                                        <div class="small text-muted">{{ record.employee.employee_id }} · {{ record.employee.category.name }}</div>
+                                    </div>
                                 </div>
                             </td>
-                            <td>{{ record.employee.department }}</td>
+                            <td>{{ record.employee.department|default:"-" }}</td>
                             <td>
                                 <i class="bi bi-box-arrow-in-right me-2 text-success"></i>
                                 {{ record.check_in_time|time:"H:i" }}
@@ -124,6 +169,10 @@
                                 {% if record.is_active %}
                                     <span class="badge bg-warning bg-opacity-10 text-warning px-3 py-2">
                                         <i class="bi bi-hourglass-split me-1"></i> Active
+                                    </span>
+                                {% elif record.is_late %}
+                                    <span class="badge bg-danger bg-opacity-10 text-danger px-3 py-2">
+                                        <i class="bi bi-exclamation-triangle me-1"></i> Late
                                     </span>
                                 {% else %}
                                     <span class="badge bg-success bg-opacity-10 text-success px-3 py-2">

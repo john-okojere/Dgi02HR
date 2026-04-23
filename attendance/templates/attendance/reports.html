@@ -1,4 +1,3 @@
-<!-- attendance/templates/attendance/reports.html -->
 {% extends 'attendance/base.html' %}
 
 {% block title %}Reports & Analytics | HR Management{% endblock %}
@@ -7,220 +6,418 @@
 
 {% block content %}
 <div class="container-fluid p-0">
-    
-    <!-- Summary Cards -->
+    <div class="card border-0 mb-4 analytics-hero">
+        <div class="card-body p-4 p-lg-5">
+            <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-4">
+                <div>
+                    <p class="text-uppercase small fw-semibold text-muted mb-1">Standard Data Report</p>
+                    <h2 class="h3 mb-2">Attendance analytics with live filters</h2>
+                    <p class="text-muted mb-0">Use one filter set for on-screen insights, trend displays, and exports.</p>
+                </div>
+                <div class="d-flex flex-wrap gap-2">
+                    <a href="{% url 'attendance_reports' %}?{{ request.GET.urlencode }}" class="btn btn-outline-secondary">
+                        <i class="bi bi-table me-1"></i> Open Attendance Table
+                    </a>
+                    <a href="{% url 'export_attendance_csv' %}?scope=reports{% if request.GET.urlencode %}&{{ request.GET.urlencode }}{% endif %}" class="btn btn-primary">
+                        <i class="bi bi-download me-1"></i> Export Filtered CSV
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card border-0 mb-4">
+        <div class="card-body">
+            <form method="GET" class="row g-3 align-items-end">
+                <div class="col-12 col-lg-3">
+                    <label class="form-label">Search</label>
+                    {{ date_form.search }}
+                </div>
+                <div class="col-6 col-lg-2">
+                    <label class="form-label">Date</label>
+                    {{ date_form.date }}
+                </div>
+                <div class="col-6 col-lg-3">
+                    <label class="form-label">Date Range</label>
+                    <div class="d-flex gap-2">
+                        {{ date_form.start_date }}
+                        {{ date_form.end_date }}
+                    </div>
+                </div>
+                <div class="col-6 col-lg-2">
+                    <label class="form-label">Department</label>
+                    {{ date_form.department }}
+                </div>
+                <div class="col-6 col-lg-2">
+                    <label class="form-label">Category</label>
+                    {{ date_form.category }}
+                </div>
+                <div class="col-6 col-lg-3">
+                    <label class="form-label">Person</label>
+                    {{ date_form.employee }}
+                </div>
+                <div class="col-6 col-lg-3">
+                    <label class="form-label">Employment Status</label>
+                    {{ date_form.employment_status }}
+                </div>
+                <div class="col-12 col-lg-6">
+                    <div class="d-flex flex-wrap gap-2 justify-content-lg-end">
+                        <button type="submit" class="btn btn-primary flex-fill flex-lg-grow-0">
+                            <i class="bi bi-funnel-fill"></i> Apply Filters
+                        </button>
+                        <a href="{% url 'reports' %}" class="btn btn-outline-secondary flex-fill flex-lg-grow-0">
+                            <i class="bi bi-arrow-counterclockwise"></i> Reset
+                        </a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <div class="row g-4 mb-4">
-        <div class="col-md-3">
-            <div class="card border-0 h-100">
+        <div class="col-sm-6 col-xl-3">
+            <div class="card border-0 h-100 metric-panel">
                 <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-start">
-                        <div>
-                            <small class="text-muted text-uppercase fw-semibold">Total Employees</small>
-                            <h3 class="mt-2 mb-0">{{ total_employees }}</h3>
-                        </div>
-                        <div class="bg-primary bg-opacity-10 p-3 rounded">
-                            <i class="bi bi-people-fill fs-4 text-primary"></i>
-                        </div>
-                    </div>
+                    <small class="text-muted text-uppercase fw-semibold">People In Scope</small>
+                    <h3 class="mt-2 mb-1">{{ total_employees }}</h3>
+                    <span class="small text-muted">Active employees matching your filters</span>
                 </div>
             </div>
         </div>
-        <div class="col-md-3">
-            <div class="card border-0 h-100">
+        <div class="col-sm-6 col-xl-3">
+            <div class="card border-0 h-100 metric-panel">
                 <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-start">
-                        <div>
-                            <small class="text-muted text-uppercase fw-semibold">Avg Daily Hours</small>
-                            <h3 class="mt-2 mb-0">7.5</h3>
-                        </div>
-                        <div class="bg-success bg-opacity-10 p-3 rounded">
-                            <i class="bi bi-clock-fill fs-4 text-success"></i>
-                        </div>
-                    </div>
+                    <small class="text-muted text-uppercase fw-semibold">Attendance Rate</small>
+                    <h3 class="mt-2 mb-1">{{ attendance_rate }}%</h3>
+                    <span class="small text-muted">{{ present_count }} present, {{ absent_count }} absent</span>
                 </div>
             </div>
         </div>
-        <div class="col-md-3">
-            <div class="card border-0 h-100">
+        <div class="col-sm-6 col-xl-3">
+            <div class="card border-0 h-100 metric-panel">
                 <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-start">
-                        <div>
-                            <small class="text-muted text-uppercase fw-semibold">Attendance Rate</small>
-                            <h3 class="mt-2 mb-0">
-                                {% if total_employees > 0 %}
-                                    {% widthratio checked_in_count|add:checked_out_count total_employees 100 %}%
-                                {% else %}
-                                    0%
-                                {% endif %}
-                            </h3>
-                        </div>
-                        <div class="bg-warning bg-opacity-10 p-3 rounded">
-                            <i class="bi bi-graph-up fs-4 text-warning"></i>
-                        </div>
-                    </div>
+                    <small class="text-muted text-uppercase fw-semibold">Late Records</small>
+                    <h3 class="mt-2 mb-1 text-warning">{{ late_records }}</h3>
+                    <span class="small text-muted">{{ checked_in_count }} still active today</span>
                 </div>
             </div>
         </div>
-        <div class="col-md-3">
-            <div class="card border-0 h-100">
+        <div class="col-sm-6 col-xl-3">
+            <div class="card border-0 h-100 metric-panel">
                 <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-start">
-                        <div>
-                            <small class="text-muted text-uppercase fw-semibold">Departments</small>
-                            <h3 class="mt-2 mb-0">{{ department_summary|length }}</h3>
+                    <small class="text-muted text-uppercase fw-semibold">Hours Logged</small>
+                    <h3 class="mt-2 mb-1">{{ total_hours }}</h3>
+                    <span class="small text-muted">Average {{ avg_daily_hours }} hrs per completed record</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4 mb-4">
+        <div class="col-xl-5">
+            <div class="card border-0 h-100">
+                <div class="card-header bg-white border-0 pt-4 px-4">
+                    <h5 class="mb-0"><i class="bi bi-activity me-2"></i>Attendance Trend</h5>
+                </div>
+                <div class="card-body">
+                    {% if trend_data %}
+                    <div class="trend-chart">
+                        {% for item in trend_data %}
+                        <div class="trend-bar-wrap">
+                            <div class="trend-value">{{ item.present }}</div>
+                            <div class="trend-bar" style="height: {{ item.percent|default:6 }}%;">
+                                <span class="trend-hours">{{ item.hours }}h</span>
+                            </div>
+                            <div class="trend-label">{{ item.label }}</div>
                         </div>
-                        <div class="bg-info bg-opacity-10 p-3 rounded">
-                            <i class="bi bi-diagram-3 fs-4 text-info"></i>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="text-center py-5 text-muted">
+                        <i class="bi bi-bar-chart-line fs-1 d-block mb-3"></i>
+                        No trend data available for this filter set
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-7">
+            <div class="row g-4">
+                <div class="col-lg-6">
+                    <div class="card border-0 h-100">
+                        <div class="card-header bg-white border-0 pt-4 px-4">
+                            <h5 class="mb-0"><i class="bi bi-collection me-2"></i>Category Breakdown</h5>
+                        </div>
+                        <div class="card-body">
+                            {% for item in category_summary %}
+                            <div class="breakdown-row">
+                                <div class="d-flex justify-content-between small mb-2">
+                                    <span>{{ item.label }}</span>
+                                    <strong>{{ item.count }}</strong>
+                                </div>
+                                <div class="progress breakdown-progress">
+                                    <div class="progress-bar bg-primary" style="width: {{ item.percent }}%"></div>
+                                </div>
+                            </div>
+                            {% empty %}
+                            <p class="text-muted mb-0">No category breakdown available.</p>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="card border-0 h-100">
+                        <div class="card-header bg-white border-0 pt-4 px-4">
+                            <h5 class="mb-0"><i class="bi bi-diagram-3 me-2"></i>Department Breakdown</h5>
+                        </div>
+                        <div class="card-body">
+                            {% for item in department_summary %}
+                            <div class="breakdown-row">
+                                <div class="d-flex justify-content-between small mb-2">
+                                    <span>{{ item.label }}</span>
+                                    <strong>{{ item.count }}</strong>
+                                </div>
+                                <div class="progress breakdown-progress">
+                                    <div class="progress-bar bg-info" style="width: {{ item.percent }}%"></div>
+                                </div>
+                            </div>
+                            {% empty %}
+                            <p class="text-muted mb-0">No department breakdown available.</p>
+                            {% endfor %}
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    
-    <div class="row g-4">
-        <!-- Monthly Summary -->
-        <div class="col-lg-8">
-            <div class="card border-0">
+
+    <div class="row g-4 mb-4">
+        <div class="col-xl-7">
+            <div class="card border-0 h-100">
                 <div class="card-header bg-white border-0 pt-4 px-4">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <h5 class="mb-0">
-                            <i class="bi bi-calendar-month me-2"></i>Monthly Attendance Summary
-                        </h5>
-                        <span class="badge bg-primary bg-opacity-10 text-primary px-3 py-2">
-                            {{ today|date:"F Y" }}
-                        </span>
-                    </div>
+                    <h5 class="mb-0"><i class="bi bi-trophy me-2"></i>Top Hours Logged</h5>
                 </div>
                 <div class="card-body p-0">
                     <div class="table-responsive">
                         <table class="table table-hover align-middle mb-0">
                             <thead>
                                 <tr>
-                                    <th>Employee</th>
+                                    <th>Person</th>
                                     <th>Department</th>
                                     <th>Days Present</th>
                                     <th>Total Hours</th>
-                                    <th>Avg Hours/Day</th>
+                                    <th>Avg Hours</th>
                                 </tr>
                             </thead>
-                        <tbody>
-    {% for stat in monthly_stats %}
-    <tr>
-        <td>
-            <div class="d-flex align-items-center">
-                <div class="bg-primary bg-opacity-10 p-2 rounded me-3">
-                    <i class="bi bi-person text-primary"></i>
-                </div>
-                {{ stat.name }}
-            </div>
-        </td>
-        <td>{{ stat.department }}</td>
-        <td>{{ stat.days_present }}</td>
-        <td>{{ stat.total_hours|floatformat:1 }} hrs</td>
-        <td>{{ stat.avg_hours }} hrs</td>
-    </tr>
-    {% empty %}
-    <tr>
-        <td colspan="5" class="text-center py-5 text-muted">
-            <i class="bi bi-calendar-x fs-1 d-block mb-3"></i>
-            No data available for this month
-        </td>
-    </tr>
-    {% endfor %}
-</tbody>
+                            <tbody>
+                                {% for row in top_people %}
+                                <tr>
+                                    <td>
+                                        <strong>{{ row.name }}</strong>
+                                        <div class="small text-muted">{{ row.employee_id }}</div>
+                                    </td>
+                                    <td>{{ row.department|default:"-" }}</td>
+                                    <td>{{ row.days_present }}</td>
+                                    <td>{{ row.total_hours }} hrs</td>
+                                    <td>{{ row.avg_hours }} hrs</td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="5" class="text-center py-5 text-muted">
+                                        <i class="bi bi-inbox fs-1 d-block mb-3"></i>
+                                        No employee activity data available
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
                         </table>
                     </div>
                 </div>
             </div>
         </div>
-        
-        <!-- Export Options -->
-        <div class="col-lg-4">
-            <div class="card border-0 mb-4">
-                <div class="card-header bg-white border-0 pt-4 px-4">
-                    <h5 class="mb-0">
-                        <i class="bi bi-download me-2"></i>Export Reports
-                    </h5>
-                </div>
-                <div class="card-body">
-                    <div class="list-group list-group-flush">
-                        <div class="list-group-item bg-transparent px-0">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <i class="bi bi-file-spreadsheet fs-5 text-success me-2"></i>
-                                    <strong>Attendance Report</strong>
-                                    <p class="text-muted small mb-0">Export all attendance records as CSV</p>
-                                </div>
-                                <a href="{% url 'export_attendance_csv' %}" class="btn btn-outline-success btn-sm">
-                                    <i class="bi bi-download"></i> Export
-                                </a>
-                            </div>
+        <div class="col-xl-5">
+            <div class="row g-4">
+                <div class="col-12">
+                    <div class="card border-0 h-100">
+                        <div class="card-header bg-white border-0 pt-4 px-4">
+                            <h5 class="mb-0"><i class="bi bi-gift me-2 text-danger"></i>Birthday Reminders</h5>
                         </div>
-                        <div class="list-group-item bg-transparent px-0">
-                            <div class="d-flex justify-content-between align-items-center">
+                        <div class="card-body">
+                            {% for bday in birthdays_this_week %}
+                            <div class="reminder-row">
                                 <div>
-                                    <i class="bi bi-file-pdf fs-5 text-danger me-2"></i>
-                                    <strong>Employee Directory</strong>
-                                    <p class="text-muted small mb-0">Coming soon</p>
+                                    <strong>{{ bday.employee.display_name }}</strong>
+                                    <div class="small text-muted">{{ bday.date|date:"F j" }}</div>
                                 </div>
-                                <button class="btn btn-outline-secondary btn-sm" disabled>
-                                    <i class="bi bi-download"></i> Export
-                                </button>
+                                <span class="badge bg-danger bg-opacity-10 text-danger">
+                                    {% if bday.days_until == 0 %}Today{% else %}{{ bday.days_until }} day{{ bday.days_until|pluralize }}{% endif %}
+                                </span>
                             </div>
-                        </div>
-                        <div class="list-group-item bg-transparent px-0">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <i class="bi bi-graph-up fs-5 text-primary me-2"></i>
-                                    <strong>Monthly Summary</strong>
-                                    <p class="text-muted small mb-0">Coming soon</p>
-                                </div>
-                                <button class="btn btn-outline-secondary btn-sm" disabled>
-                                    <i class="bi bi-download"></i> Export
-                                </button>
-                            </div>
+                            {% empty %}
+                            <p class="text-muted mb-0">No upcoming birthdays in the reminder window.</p>
+                            {% endfor %}
                         </div>
                     </div>
                 </div>
-            </div>
-            
-            <!-- Quick Stats -->
-            <div class="card border-0">
-                <div class="card-header bg-white border-0 pt-4 px-4">
-                    <h5 class="mb-0">
-                        <i class="bi bi-bar-chart me-2"></i>Quick Statistics
-                    </h5>
-                </div>
-                <div class="card-body">
-                    <div class="mb-3">
-                        <label class="text-muted small text-uppercase fw-semibold">Attendance Today</label>
-                        <div class="progress mt-2" style="height: 8px;">
-                            {% if total_employees > 0 %}
-                                {% with present_percent=checked_in_count|add:checked_out_count %}
-                                    {% widthratio present_percent total_employees 100 as percent %}
-                                    <div class="progress-bar bg-success" style="width: {{ percent }}%"></div>
-                                {% endwith %}
-                            {% endif %}
+                <div class="col-12">
+                    <div class="card border-0 h-100">
+                        <div class="card-header bg-white border-0 pt-4 px-4">
+                            <h5 class="mb-0"><i class="bi bi-hourglass-split me-2 text-warning"></i>Internship Ending Soon</h5>
                         </div>
-                        <div class="d-flex justify-content-between mt-1">
-                            <small>{{ checked_in_count|add:checked_out_count }} Present</small>
-                            <small>{{ absent_count }} Absent</small>
+                        <div class="card-body">
+                            {% for item in internship_endings %}
+                            <div class="reminder-row">
+                                <div>
+                                    <strong>{{ item.employee.display_name }}</strong>
+                                    <div class="small text-muted">{{ item.date|date:"F j" }}</div>
+                                </div>
+                                <span class="badge bg-warning bg-opacity-10 text-warning">
+                                    {% if item.days_until == 0 %}Today{% else %}{{ item.days_until }} day{{ item.days_until|pluralize }}{% endif %}
+                                </span>
+                            </div>
+                            {% empty %}
+                            <p class="text-muted mb-0">No interns are nearing their end date.</p>
+                            {% endfor %}
                         </div>
-                    </div>
-                    
-                    <div class="mb-3">
-                        <label class="text-muted small text-uppercase fw-semibold">Currently Working</label>
-                        <h4 class="mb-0">{{ checked_in_count }} <small class="text-muted fs-6">employees</small></h4>
-                    </div>
-                    
-                    <div>
-                        <label class="text-muted small text-uppercase fw-semibold">Completed Today</label>
-                        <h4 class="mb-0">{{ checked_out_count }} <small class="text-muted fs-6">employees</small></h4>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+
+    <div class="card border-0">
+        <div class="card-header bg-white border-0 pt-4 px-4">
+            <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-2">
+                <div>
+                    <h5 class="mb-1"><i class="bi bi-table me-2"></i>Recent Filtered Records</h5>
+                    <small class="text-muted">Showing up to 20 records from the current analytics scope.</small>
+                </div>
+                <span class="badge bg-primary bg-opacity-10 text-primary px-3 py-2">{{ records_total }} row{{ records_total|pluralize }}</span>
+            </div>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Person</th>
+                            <th>Department</th>
+                            <th>Check In</th>
+                            <th>Check Out</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for record in records %}
+                        <tr>
+                            <td>{{ record.check_in_time|date:"M d, Y" }}</td>
+                            <td>
+                                <strong>{{ record.employee.display_name }}</strong>
+                                <div class="small text-muted">{{ record.employee.employee_id }} · {{ record.employee.category.name }}</div>
+                            </td>
+                            <td>{{ record.employee.department|default:"-" }}</td>
+                            <td>{{ record.check_in_time|time:"H:i" }}</td>
+                            <td>{% if record.check_out_time %}{{ record.check_out_time|time:"H:i" }}{% else %}<span class="text-muted">Open</span>{% endif %}</td>
+                            <td>
+                                <span class="badge {% if record.is_active %}bg-warning bg-opacity-10 text-warning{% elif record.is_late %}bg-danger bg-opacity-10 text-danger{% else %}bg-success bg-opacity-10 text-success{% endif %}">
+                                    {% if record.is_active %}Active{% elif record.is_late %}Late{% else %}Completed{% endif %}
+                                </span>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="6" class="text-center py-5 text-muted">
+                                <i class="bi bi-bar-chart fs-1 d-block mb-3"></i>
+                                No records found for the current analytics filter
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 </div>
+
+<style>
+    .analytics-hero {
+        background:
+            radial-gradient(circle at top right, rgba(var(--bs-primary-rgb), 0.16), transparent 32%),
+            linear-gradient(135deg, #ffffff, #f8fbff 55%, #eef6ff);
+    }
+    .metric-panel {
+        box-shadow: 0 16px 36px rgba(15, 23, 42, 0.06);
+    }
+    .trend-chart {
+        min-height: 260px;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(44px, 1fr));
+        gap: 12px;
+        align-items: end;
+    }
+    .trend-bar-wrap {
+        display: flex;
+        flex-direction: column;
+        justify-content: end;
+        align-items: center;
+        height: 260px;
+    }
+    .trend-value {
+        font-size: 0.85rem;
+        font-weight: 700;
+        margin-bottom: 8px;
+        color: #0f172a;
+    }
+    .trend-bar {
+        width: 100%;
+        min-height: 16px;
+        border-radius: 14px 14px 6px 6px;
+        background: linear-gradient(180deg, #1d4ed8, #0f766e);
+        position: relative;
+        display: flex;
+        justify-content: center;
+        align-items: start;
+    }
+    .trend-hours {
+        position: absolute;
+        top: 10px;
+        font-size: 0.7rem;
+        color: rgba(255, 255, 255, 0.9);
+    }
+    .trend-label {
+        margin-top: 10px;
+        font-size: 0.72rem;
+        color: #64748b;
+        text-align: center;
+    }
+    .breakdown-row {
+        margin-bottom: 16px;
+    }
+    .breakdown-row:last-child {
+        margin-bottom: 0;
+    }
+    .breakdown-progress {
+        height: 10px;
+        background: #eef2ff;
+    }
+    .reminder-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 16px;
+        padding: 12px 0;
+        border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+    }
+    .reminder-row:last-child {
+        border-bottom: 0;
+        padding-bottom: 0;
+    }
+    @media (max-width: 991.98px) {
+        .trend-chart {
+            grid-template-columns: repeat(5, minmax(40px, 1fr));
+            overflow-x: auto;
+        }
+    }
+</style>
 {% endblock %}

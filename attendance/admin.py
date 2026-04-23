@@ -4,7 +4,7 @@ from django.contrib import admin
 from django.utils.html import format_html
 from django.utils import timezone
 from datetime import timedelta
-from .models import Category, Department, Employee, AttendanceRecord
+from .models import Category, Department, Employee, AttendanceRecord, AttendanceSettings
 
 
 @admin.register(Category)
@@ -149,3 +149,14 @@ class AttendanceRecordAdmin(admin.ModelAdmin):
             return format_html('<span style="color: #10b981;">Active</span>')
         return format_html('<span style="color: #3b82f6;">Completed</span>')
     status_badge.short_description = 'Status'
+
+
+@admin.register(AttendanceSettings)
+class AttendanceSettingsAdmin(admin.ModelAdmin):
+    list_display = ['late_threshold', 'birthday_reminder_days', 'internship_reminder_days', 'updated_at']
+
+    def has_add_permission(self, request):
+        return not AttendanceSettings.objects.exists()
+
+    def has_delete_permission(self, request, obj=None):
+        return False

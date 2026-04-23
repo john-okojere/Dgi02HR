@@ -216,3 +216,35 @@ class DateFilterForm(forms.Form):
         required=False,
         empty_label="All People"
     )
+
+    category = forms.ModelChoiceField(
+        queryset=Category.objects.order_by('name'),
+        widget=forms.Select(attrs={'class': 'form-select'}),
+        required=False,
+        empty_label="All Categories"
+    )
+
+    department = forms.ModelChoiceField(
+        queryset=Department.objects.filter(is_active=True).order_by('name'),
+        widget=forms.Select(attrs={'class': 'form-select'}),
+        required=False,
+        empty_label="All Departments"
+    )
+
+    employment_status = forms.ChoiceField(
+        choices=[('', 'All Employment Status')] + list(Employee.EMPLOYMENT_STATUS),
+        widget=forms.Select(attrs={'class': 'form-select'}),
+        required=False
+    )
+
+    search = forms.CharField(
+        required=False,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Search name, email, or employee ID'
+        })
+    )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['employee'].queryset = Employee.objects.filter(is_active=True).order_by('first_name', 'last_name')

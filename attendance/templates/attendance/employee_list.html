@@ -11,28 +11,40 @@
     <!-- Filters and Actions Bar -->
     <div class="card border-0 mb-4">
         <div class="card-body">
-            <div class="row align-items-center">
-                <div class="col-md-4">
+            <div class="row align-items-center g-3">
+                <div class="col-12 col-xl-4">
                     <form method="GET" class="d-flex">
                         <div class="input-group">
                             <span class="input-group-text bg-white border-end-0">
                                 <i class="bi bi-search"></i>
                             </span>
                             <input type="text" name="search" class="form-control border-start-0" 
-                                   placeholder="Search employees..." value="{{ search_query }}">
+                                   placeholder="Search name, email, or employee ID..." value="{{ search_query }}">
+                            <input type="hidden" name="department" value="{{ selected_department }}">
+                            <input type="hidden" name="category" value="{{ selected_category }}">
+                            <input type="hidden" name="status" value="{{ selected_status }}">
                             <button type="submit" class="btn btn-primary">
                                 Search
                             </button>
                         </div>
                     </form>
                 </div>
-                <div class="col-md-6">
-                    <form method="GET" class="d-flex gap-2">
+                <div class="col-12 col-xl-6">
+                    <form method="GET" class="d-flex gap-2 flex-wrap">
+                        <input type="hidden" name="search" value="{{ search_query }}">
                         <select name="department" class="form-select">
                             <option value="">All Departments</option>
                             {% for dept in departments %}
                                 <option value="{{ dept.id }}" {% if selected_department == dept.id|stringformat:"s" %}selected{% endif %}>
                                     {{ dept.name }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                        <select name="category" class="form-select">
+                            <option value="">All Categories</option>
+                            {% for category in categories %}
+                                <option value="{{ category.id }}" {% if selected_category == category.id|stringformat:"s" %}selected{% endif %}>
+                                    {{ category.name }}
                                 </option>
                             {% endfor %}
                         </select>
@@ -44,15 +56,15 @@
                         <button type="submit" class="btn btn-outline-secondary">
                             <i class="bi bi-funnel"></i> Filter
                         </button>
-                        {% if search_query or selected_department or selected_status %}
+                        {% if search_query or selected_department or selected_category or selected_status %}
                             <a href="{% url 'employee_list' %}" class="btn btn-outline-danger">
                                 <i class="bi bi-x-circle"></i> Clear
                             </a>
                         {% endif %}
                     </form>
                 </div>
-                <div class="col-md-2 text-end">
-                    <a href="{% url 'employee_create' %}" class="btn btn-primary">
+                <div class="col-12 col-xl-2 text-xl-end">
+                    <a href="{% url 'employee_create' %}" class="btn btn-primary w-100">
                         <i class="bi bi-person-plus"></i> Add Employee
                     </a>
                 </div>

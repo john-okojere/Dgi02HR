@@ -2,7 +2,7 @@
 
 from django.db import models
 from django.utils import timezone
-from datetime import date
+from datetime import date, time
 
 
 class Category(models.Model):
@@ -241,8 +241,10 @@ class AttendanceRecord(models.Model):
     
     @property
     def is_late(self):
-        """Check if check-in was after 9:00 AM"""
-        return self.check_in_time.hour >= 9
+        """Check if check-in was after the configured late threshold."""
+        local_check_in = timezone.localtime(self.check_in_time)
+        threshold = AttendanceSettings.get_solo().late_threshold
+        return local_check_in.time() >= threshold
     
     @property
     def status(self):
@@ -252,3 +254,30 @@ class AttendanceRecord(models.Model):
                 return 'late'
             return 'active'
         return 'completed'
+
+
+class AttendanceSettings(models.Model):
+    """Singleton-like settings for attendance behavior and reminders."""
+
+    late_threshold = models.TimeField(default=time(9, 0), help_text="Check-ins at or after this time are marked late.")
+    birthday_reminder_days = models.PositiveSmallIntegerField(default=7)
+    internship_reminder_days = models.PositiveSmallIntegerField(default=14)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = "Attendance Settings"
+        verbose_name_plural = "Attendance Settings"
+
+    def save(self, *args, **kwargs):
+        self.pk = 1
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return "Attendance Settings"
+
+    @classmethod
+    def get_solo(cls):
+        settings_obj = cls.objects.first()
+        if settings_obj:
+            return settings_obj
+        return cls(pk=1)

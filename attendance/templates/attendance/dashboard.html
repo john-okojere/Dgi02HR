@@ -32,7 +32,7 @@
                     <div class="d-flex justify-content-between align-items-start gap-3">
                         <div>
                             <div class="metric-label">Present</div>
-                            <div class="metric-value text-success">{{ checked_in_count }}</div>
+                            <div class="metric-value text-success">{{ present_count }}</div>
                         </div>
                         <div class="metric-icon bg-success bg-opacity-10 text-success">
                             <i class="bi bi-box-arrow-in-right"></i>
@@ -49,6 +49,7 @@
                         <div>
                             <div class="metric-label">Late Today</div>
                             <div class="metric-value text-warning">{{ late_count }}</div>
+                            <small class="text-muted">After {{ late_threshold|time:"H:i" }}</small>
                         </div>
                         <div class="metric-icon bg-warning bg-opacity-10 text-warning">
                             <i class="bi bi-clock-history"></i>
@@ -98,7 +99,7 @@
                             <div class="metric-label">Attendance</div>
                             <div class="metric-value">
                                 {% if total_employees > 0 %}
-                                    {% widthratio checked_in_count|add:checked_out_count total_employees 100 %}%
+                                    {% widthratio present_count total_employees 100 %}%
                                 {% else %}
                                     0%
                                 {% endif %}
@@ -117,7 +118,8 @@
     <div class="row g-4 mb-4">
         {% for stat in category_stats %}
         <div class="col-lg-4 col-md-6">
-            <div class="card border-0 h-100">
+            <a href="{% url 'category_dashboard' stat.category.code %}" class="text-decoration-none text-reset category-card-link d-block h-100">
+            <div class="card border-0 h-100 category-card">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-start mb-3">
                         <div class="d-flex align-items-center">
@@ -129,6 +131,7 @@
                                 <small class="text-muted">Total: {{ stat.total }}</small>
                             </div>
                         </div>
+                        <i class="bi bi-arrow-up-right-circle text-muted"></i>
                     </div>
                     <div class="row text-center border-top pt-3">
                         <div class="col-4">
@@ -146,6 +149,7 @@
                     </div>
                 </div>
             </div>
+            </a>
         </div>
         {% empty %}
         <div class="col-12">
@@ -320,6 +324,41 @@
                 </div>
             </div>
             {% endif %}
+
+            {% if internship_endings %}
+            <div class="card border-0 mb-4">
+                <div class="card-header bg-white border-0 pt-4 px-4">
+                    <h5 class="mb-0">
+                        <i class="bi bi-hourglass-split me-2 text-warning"></i>Internship Ending Soon
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% for item in internship_endings %}
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="bg-warning bg-opacity-10 p-3 rounded me-3">
+                            <i class="bi bi-briefcase text-warning fs-5"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <strong>{{ item.employee.display_name }}</strong>
+                            <br>
+                            <small class="text-muted">
+                                {% if item.days_until == 0 %}
+                                    <span class="text-warning fw-bold">
+                                        <i class="bi bi-stars"></i> Ends today
+                                    </span>
+                                {% elif item.days_until == 1 %}
+                                    <i class="bi bi-calendar-event"></i> Ends tomorrow
+                                {% else %}
+                                    <i class="bi bi-calendar3"></i> Ends in {{ item.days_until }} days
+                                {% endif %}
+                                <span class="d-block small">{{ item.date|date:"F j" }}</span>
+                            </small>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
             
             <!-- Quick Actions -->
             <div class="card border-0 mb-4">
@@ -352,7 +391,7 @@
                             <h6 class="mb-1">Kiosk Ready</h6>
                             <p class="text-muted small mb-0">
                                 Employees can check in at:<br>
-                                <code>{{ request.build_absolute_uri }}{% url 'kiosk' %}</code>
+                                <code>{{ kiosk_url }}</code>
                             </p>
                         </div>
                     </div>
@@ -418,6 +457,21 @@
 
     .badge {
         font-weight: 500;
+    }
+    .category-card-link {
+        transition: transform 0.2s ease;
+    }
+    .category-card {
+        transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+    }
+    .category-card-link:hover .category-card,
+    .category-card-link:focus .category-card {
+        transform: translateY(-4px);
+        box-shadow: 0 22px 48px rgba(15, 23, 42, 0.14);
+    }
+    .category-card-link:hover h6,
+    .category-card-link:focus h6 {
+        color: var(--bs-primary);
     }
     code {
         background: #f1f5f9;
