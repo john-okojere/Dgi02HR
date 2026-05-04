@@ -74,22 +74,44 @@
         </div>
     </div>
 
+    <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-2 mb-4">
+        <div>
+            <h5 class="mb-1">
+                <i class="bi bi-graph-up me-2"></i>
+                {% if date_form.cleaned_data.date %}
+                    Analytics for {{ date_form.cleaned_data.date|date:"F j, Y" }}
+                {% elif date_form.cleaned_data.start_date and date_form.cleaned_data.end_date %}
+                    Analytics from {{ date_form.cleaned_data.start_date|date:"M j" }} to {{ date_form.cleaned_data.end_date|date:"M j, Y" }}
+                {% else %}
+                    Overall Attendance Analytics
+                {% endif %}
+            </h5>
+            <small class="text-muted">
+                {% if date_form.cleaned_data.date or date_form.cleaned_data.start_date and date_form.cleaned_data.end_date %}
+                    The report is using your selected attendance period.
+                {% else %}
+                    No date filter applied, so this report includes all attendance records.
+                {% endif %}
+            </small>
+        </div>
+    </div>
+
     <div class="row g-4 mb-4">
         <div class="col-sm-6 col-xl-3">
             <div class="card border-0 h-100 metric-panel">
                 <div class="card-body">
                     <small class="text-muted text-uppercase fw-semibold">People In Scope</small>
                     <h3 class="mt-2 mb-1">{{ total_employees }}</h3>
-                    <span class="small text-muted">Active employees matching your filters</span>
+                    <span class="small text-muted">People matching your current report filters</span>
                 </div>
             </div>
         </div>
         <div class="col-sm-6 col-xl-3">
             <div class="card border-0 h-100 metric-panel">
                 <div class="card-body">
-                    <small class="text-muted text-uppercase fw-semibold">Attendance Rate</small>
+                    <small class="text-muted text-uppercase fw-semibold">Coverage Rate</small>
                     <h3 class="mt-2 mb-1">{{ attendance_rate }}%</h3>
-                    <span class="small text-muted">{{ present_count }} present, {{ absent_count }} absent</span>
+                    <span class="small text-muted">{{ present_count }} people with records, {{ absent_count }} without records</span>
                 </div>
             </div>
         </div>
@@ -98,7 +120,7 @@
                 <div class="card-body">
                     <small class="text-muted text-uppercase fw-semibold">Late Records</small>
                     <h3 class="mt-2 mb-1 text-warning">{{ late_records }}</h3>
-                    <span class="small text-muted">{{ checked_in_count }} still active today</span>
+                    <span class="small text-muted">{{ checked_in_count }} open records in this period</span>
                 </div>
             </div>
         </div>
@@ -194,8 +216,17 @@
     <div class="row g-4 mb-4">
         <div class="col-xl-7">
             <div class="card border-0 h-100">
-                <div class="card-header bg-white border-0 pt-4 px-4">
-                    <h5 class="mb-0"><i class="bi bi-trophy me-2"></i>Top Hours Logged</h5>
+                    <div class="card-header bg-white border-0 pt-4 px-4">
+                    <div>
+                        <h5 class="mb-1"><i class="bi bi-trophy me-2"></i>Top Hours Logged</h5>
+                        <small class="text-muted">
+                            {% if has_completed_hours %}
+                                Hours are calculated from completed check-outs in the selected report scope.
+                            {% else %}
+                                No completed check-outs yet in this report scope, so hours remain at 0.
+                            {% endif %}
+                        </small>
+                    </div>
                 </div>
                 <div class="card-body p-0">
                     <div class="table-responsive">

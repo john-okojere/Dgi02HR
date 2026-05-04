@@ -44,40 +44,40 @@
 
     <div class="card border-0 mb-4">
         <div class="card-body">
-            <form method="GET" class="row g-3 align-items-end">
-                <div class="col-12 col-lg-3">
+            <form method="GET" class="row g-3 align-items-end report-filter-form">
+                <div class="col-12 col-xl-3">
                     <label class="form-label"><i class="bi bi-search"></i> Search</label>
                     {{ date_form.search }}
                 </div>
-                <div class="col-6 col-lg-2">
+                <div class="col-12 col-sm-6 col-xl-2">
                     <label class="form-label"><i class="bi bi-calendar3"></i> Date</label>
                     {{ date_form.date }}
                 </div>
-                <div class="col-6 col-lg-3">
+                <div class="col-12 col-sm-6 col-xl-3">
                     <label class="form-label"><i class="bi bi-calendar-range"></i> Range</label>
-                    <div class="d-flex gap-2">
+                    <div class="report-range-fields">
                         {{ date_form.start_date }}
                         {{ date_form.end_date }}
                     </div>
                 </div>
-                <div class="col-6 col-lg-2">
+                <div class="col-12 col-sm-6 col-xl-2">
                     <label class="form-label"><i class="bi bi-diagram-3"></i> Department</label>
                     {{ date_form.department }}
                 </div>
-                <div class="col-6 col-lg-2">
+                <div class="col-12 col-sm-6 col-xl-2">
                     <label class="form-label"><i class="bi bi-collection"></i> Category</label>
                     {{ date_form.category }}
                 </div>
-                <div class="col-6 col-lg-3">
+                <div class="col-12 col-md-6 col-xl-3">
                     <label class="form-label"><i class="bi bi-person"></i> Person</label>
                     {{ date_form.employee }}
                 </div>
-                <div class="col-6 col-lg-3">
+                <div class="col-12 col-md-6 col-xl-3">
                     <label class="form-label"><i class="bi bi-person-badge"></i> Employment Status</label>
                     {{ date_form.employment_status }}
                 </div>
-                <div class="col-12 col-lg-6">
-                    <div class="d-flex gap-2 flex-wrap justify-content-lg-end">
+                <div class="col-12">
+                    <div class="d-flex gap-2 flex-wrap justify-content-lg-end report-filter-actions">
                         <a href="{% url 'manual_attendance_add' %}" class="btn btn-success flex-fill flex-lg-grow-0">
                             <i class="bi bi-plus-circle"></i> Add Manual Entry
                         </a>
@@ -112,7 +112,30 @@
         </div>
     </div>
 
-    <div class="card border-0">
+
+
+      <div class="card border-0" id="attendance-records">
+        <div class="card-header bg-white border-0 pt-4 px-4">
+            <div class="d-flex justify-content-between align-items-center gap-3 flex-wrap">
+                <div>
+                    <h5 class="mb-1">
+                        <i class="bi bi-table me-2"></i>Attendance Records
+                    </h5>
+                    <small class="text-muted">
+                        {% if date_form.cleaned_data.date %}
+                            Showing the detailed entries for {{ date_form.cleaned_data.date|date:"F j, Y" }}.
+                        {% else %}
+                            Showing the current filtered attendance records.
+                        {% endif %}
+                    </small>
+                </div>
+                {% if date_form.cleaned_data.date %}
+                <a href="#attendance-day-list" class="btn btn-outline-secondary btn-sm">
+                    <i class="bi bi-arrow-up me-1"></i> Back to Day List
+                </a>
+                {% endif %}
+            </div>
+        </div>
         <div class="card-body p-0">
             <div class="table-responsive">
                 <table class="table table-hover align-middle mb-0">
@@ -217,5 +240,173 @@
         </div>
         {% endif %}
     </div>
+
+
+    {% if date_form.cleaned_data.date %}
+    <div class="card border-0 mb-4 report-focus-card">
+        <div class="card-body d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
+            <div>
+                <small class="text-uppercase fw-semibold report-focus-label">Current View</small>
+                <h6 class="mb-1 report-focus-title">You are viewing attendance for {{ date_form.cleaned_data.date|date:"F j, Y" }}</h6>
+                <p class="mb-0 report-focus-copy">Use the day list below to switch dates, or return to today when you are done.</p>
+            </div>
+            <div class="d-flex gap-2 flex-wrap">
+                <a href="{% url 'attendance_reports' %}" class="btn btn-primary">
+                    <i class="bi bi-calendar-day me-1"></i> Back to Today
+                </a>
+                <a href="#attendance-day-list" class="btn btn-outline-primary">
+                    <i class="bi bi-arrow-up me-1"></i> Change Day
+                </a>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="card border-0 mb-4" id="attendance-day-list">
+        <div class="card-header bg-white border-0 pt-4 px-4">
+            <div class="d-flex justify-content-between align-items-center gap-3 flex-wrap">
+                <div>
+                    <h5 class="mb-1">
+                        <i class="bi bi-calendar-week me-2"></i>Previous Attendance Days
+                    </h5>
+                    <small class="report-step-copy">Step 1: pick a day. Step 2: review its records in the table below.</small>
+                </div>
+            </div>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>People Present</th>
+                            <th>Entries</th>
+                            <th>Completed</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for day in recent_attendance_days %}
+                        <tr {% if date_form.cleaned_data.date == day.attendance_date %}class="day-list-active"{% endif %}>
+                            <td>
+                                <strong>{{ day.attendance_date|date:"D, M j, Y" }}</strong>
+                                {% if date_form.cleaned_data.date == day.attendance_date %}
+                                    <span class="badge bg-primary bg-opacity-10 text-primary ms-2">Viewing</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ day.people_count }}</td>
+                            <td>{{ day.total_records }}</td>
+                            <td>{{ day.completed_records }}</td>
+                            <td class="text-end">
+                                {% if date_form.cleaned_data.date == day.attendance_date %}
+                                    <a href="#attendance-records" class="btn btn-sm btn-primary">
+                                        Viewing Now
+                                    </a>
+                                {% else %}
+                                    <a href="{% url 'attendance_reports' %}?date={{ day.attendance_date|date:'Y-m-d' }}#attendance-records" class="btn btn-sm btn-outline-primary">
+                                        View Day
+                                    </a>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5" class="text-center py-5 text-muted">
+                                <i class="bi bi-calendar-x fs-1 d-block mb-3"></i>
+                                No attendance history yet
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+  
+
+    <style>
+        .report-filter-form .form-control,
+        .report-filter-form .form-select {
+            width: 100%;
+            min-width: 0;
+        }
+
+        .report-range-fields {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 0.75rem;
+        }
+
+        .report-filter-actions .btn {
+            min-width: 0;
+        }
+
+        .report-focus-card {
+            background: linear-gradient(135deg, rgba(255,255,255,0.98), rgba(239,246,255,0.96));
+            border: 1px solid rgba(59, 130, 246, 0.18);
+            box-shadow: 0 18px 40px rgba(15, 23, 42, 0.12);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .report-focus-card::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 6px;
+            background: linear-gradient(180deg, #2563eb, #0f172a);
+        }
+
+        .report-focus-label {
+            color: #2563eb;
+            letter-spacing: 0.08em;
+        }
+
+        .report-focus-title {
+            color: #0f172a;
+            font-size: 1.1rem;
+        }
+
+        .report-focus-copy,
+        .report-step-copy {
+            color: #475569;
+        }
+
+        .day-list-active td {
+            background: rgba(37, 99, 235, 0.08) !important;
+        }
+
+        @media (max-width: 767.98px) {
+            .report-filter-form .form-label {
+                margin-bottom: 0.45rem;
+            }
+
+            .report-filter-actions {
+                justify-content: stretch !important;
+            }
+
+            .report-filter-actions .btn {
+                flex: 1 1 100%;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .report-range-fields {
+                grid-template-columns: 1fr;
+            }
+
+            .report-filter-form .card-body,
+            .report-focus-card .card-body {
+                padding: 1rem;
+            }
+
+            .report-focus-card .btn {
+                flex: 1 1 100%;
+            }
+        }
+    </style>
 </div>
 {% endblock %}

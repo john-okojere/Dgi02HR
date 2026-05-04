@@ -64,7 +64,6 @@
         .mobile-header {
             display: none;
             background: var(--surface-2);
-            backdrop-filter: blur(10px);
             padding: 12px 16px;
             box-shadow: var(--shadow-soft);
             position: fixed;
@@ -94,7 +93,6 @@
         /* Sidebar */
         .sidebar {
             background: var(--surface-2);
-            backdrop-filter: blur(10px);
             min-height: 100vh;
             box-shadow: var(--shadow-soft);
             position: fixed;
@@ -200,7 +198,6 @@
         
         .top-bar {
             background: var(--surface);
-            backdrop-filter: blur(10px);
             padding: 16px 24px;
             border-radius: 12px;
             box-shadow: var(--shadow-soft);
@@ -218,7 +215,6 @@
             border: none;
             border-radius: 18px;
             background: var(--surface);
-            backdrop-filter: blur(10px);
             box-shadow: var(--shadow-soft);
             transition: transform 0.2s, box-shadow 0.2s;
             margin-bottom: 20px;
@@ -480,20 +476,22 @@
             overflow: hidden;
         }
         
-        /* Animation */
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        /* Rendering stability */
+        .card,
+        .top-bar,
+        .sidebar,
+        .mobile-header {
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
         }
-        
-        .card {
-            animation: slideIn 0.3s ease;
+
+        @media (max-width: 992px) {
+            .card,
+            .top-bar,
+            .sidebar,
+            .mobile-header {
+                box-shadow: 0 8px 20px rgba(15, 23, 42, 0.12);
+            }
         }
     </style>
     

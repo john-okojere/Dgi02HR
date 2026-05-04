@@ -153,7 +153,7 @@ class AttendanceRecordAdmin(admin.ModelAdmin):
 
 @admin.register(AttendanceSettings)
 class AttendanceSettingsAdmin(admin.ModelAdmin):
-    list_display = ['late_threshold', 'birthday_reminder_days', 'internship_reminder_days', 'updated_at']
+    list_display = ['workday_start', 'late_threshold', 'birthday_reminder_days', 'internship_reminder_days', 'updated_at']
 
     def has_add_permission(self, request):
         return not AttendanceSettings.objects.exists()

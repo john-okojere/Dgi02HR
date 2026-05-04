@@ -6,6 +6,7 @@ from django.utils import timezone
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login, logout, authenticate
 from django.db.models import Q, Count
+from django.db.models.functions import TruncDate
 from django.http import HttpResponse
 from django.urls import reverse
 from datetime import timedelta, date
@@ -119,7 +120,9 @@ def dashboard_view(request):
     """Main HR Dashboard"""
     
     today = timezone.now().date()
-    late_threshold = get_attendance_settings().late_threshold
+    settings_obj = get_attendance_settings()
+    late_threshold = settings_obj.late_threshold
+    workday_start = settings_obj.workday_start
     
     # Statistics
     active_employees = Employee.objects.filter(is_active=True).select_related('category', 'department')
@@ -137,7 +140,7 @@ def dashboard_view(request):
     
     # Recent activity
     recent_attendance = todays_records.order_by('-check_in_time')[:5]
-    
+
     # Birthdays this week
     birthdays_this_week = get_upcoming_birthdays()
     internship_endings = get_upcoming_internship_endings()
@@ -183,6 +186,7 @@ def dashboard_view(request):
         'category_stats': category_stats,
         'kiosk_url': request.build_absolute_uri(reverse('kiosk')),
         'late_threshold': late_threshold,
+        'workday_start': workday_start,
         'page_title': 'Dashboard',
     }
     
@@ -407,12 +411,24 @@ def attendance_reports(request):
     records = records.order_by('-check_in_time')
     total_hours = sum((record.hours_worked or 0) for record in records)
     late_records = sum(1 for record in records if record.is_late)
+    recent_attendance_days = list(
+        AttendanceRecord.objects.filter(employee__is_active=True)
+        .annotate(attendance_date=TruncDate('check_in_time'))
+        .values('attendance_date')
+        .annotate(
+            people_count=Count('employee_id', distinct=True),
+            total_records=Count('id'),
+            completed_records=Count('id', filter=Q(check_out_time__isnull=False)),
+        )
+        .order_by('-attendance_date')[:14]
+    )
     
     context = {
         'records': records,
         'date_form': date_form,
         'total_hours': round(total_hours, 2),
         'late_records': late_records,
+        'recent_attendance_days': recent_attendance_days,
         'page_title': 'Attendance Reports',
     }
     
@@ -457,11 +473,11 @@ def reports_view(request):
     
     today = timezone.now().date()
     date_form = DateFilterForm(request.GET or None)
-    records = build_filtered_attendance_queryset(date_form, default_to_current_month=True).order_by('-check_in_time')
+    records = build_filtered_attendance_queryset(date_form).order_by('-check_in_time')
     employee_scope = build_employee_scope(date_form.cleaned_data if date_form.is_valid() else {})
     records_total = records.count()
 
-    total_employees = employee_scope.filter(is_active=True).count()
+    total_employees = employee_scope.count()
     present_count = records.values('employee_id').distinct().count()
     checked_in_count = records.filter(check_out_time__isnull=True).count()
     checked_out_count = records.filter(check_out_time__isnull=False).count()
@@ -474,7 +490,9 @@ def reports_view(request):
     department_summary = build_scope_breakdown(employee_scope, 'department', 'department__name')
     category_summary = build_scope_breakdown(employee_scope, 'category', 'category__name')
     trend_data = build_attendance_trend(records)
-    top_people = build_person_hours_summary(records)[:6]
+    person_hours_summary = build_person_hours_summary(records)
+    top_people = person_hours_summary[:6]
+    has_completed_hours = any(row['total_hours'] > 0 for row in person_hours_summary)
 
     context = {
         'today': today,
@@ -494,6 +512,7 @@ def reports_view(request):
         'category_summary': category_summary,
         'trend_data': trend_data,
         'top_people': top_people,
+        'has_completed_hours': has_completed_hours,
         'birthdays_this_week': get_upcoming_birthdays(),
         'internship_endings': get_upcoming_internship_endings(),
         'page_title': 'Reports & Analytics',
@@ -510,7 +529,7 @@ def export_attendance_csv(request):
     records = build_filtered_attendance_queryset(
         date_form,
         default_to_today=(export_scope != 'reports'),
-        default_to_current_month=(export_scope == 'reports'),
+        default_to_current_month=False,
     ).order_by('-check_in_time')
     
     # Create HTTP response with CSV
@@ -642,17 +661,21 @@ def build_person_hours_summary(records):
                 'name': employee.display_name,
                 'employee_id': employee.employee_id,
                 'department': employee.department,
-                'days_present': 0,
+                'attendance_days': set(),
+                'completed_sessions': 0,
                 'total_hours': 0,
             }
-        summary[employee.pk]['days_present'] += 1
-        summary[employee.pk]['total_hours'] += record.hours_worked or 0
+        summary[employee.pk]['attendance_days'].add(timezone.localtime(record.check_in_time).date())
+        if record.hours_worked is not None:
+            summary[employee.pk]['completed_sessions'] += 1
+            summary[employee.pk]['total_hours'] += record.hours_worked
 
     rows = list(summary.values())
     for row in rows:
+        row['days_present'] = len(row.pop('attendance_days'))
         row['total_hours'] = round(row['total_hours'], 1)
-        row['avg_hours'] = round((row['total_hours'] / row['days_present']), 2) if row['days_present'] else 0
-    rows.sort(key=lambda item: item['total_hours'], reverse=True)
+        row['avg_hours'] = round((row['total_hours'] / row['completed_sessions']), 2) if row['completed_sessions'] else 0
+    rows.sort(key=lambda item: (item['total_hours'], item['days_present']), reverse=True)
     return rows
 
 

@@ -259,7 +259,8 @@ class AttendanceRecord(models.Model):
 class AttendanceSettings(models.Model):
     """Singleton-like settings for attendance behavior and reminders."""
 
-    late_threshold = models.TimeField(default=time(9, 0), help_text="Check-ins at or after this time are marked late.")
+    workday_start = models.TimeField(default=time(8, 0), help_text="Official workday start time.")
+    late_threshold = models.TimeField(default=time(8, 30), help_text="Check-ins at or after this time are marked late.")
     birthday_reminder_days = models.PositiveSmallIntegerField(default=7)
     internship_reminder_days = models.PositiveSmallIntegerField(default=14)
     updated_at = models.DateTimeField(auto_now=True)
